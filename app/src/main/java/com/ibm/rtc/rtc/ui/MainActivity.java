@@ -108,7 +108,15 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
 
         ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem().withName("Jack")
                 .withEmail("Jackwangcs@outlook.com")
-                .withIcon(R.mipmap.ic_launcher);
+                .withIcon(R.mipmap.ic_launcher)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        MainActivity.this.startActivity(intent);
+                        return true;
+                    }
+                });
 
         headerBuilder.addProfiles(profileDrawerItem);
         return headerBuilder.build();
@@ -124,17 +132,17 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
     }
 
     public boolean OnWorkitemsSelected() {
-        Snackbar.make(mContentView, "WorkItems clicked", Snackbar.LENGTH_SHORT);
+        Snackbar.make(mContentView, "WorkItems clicked", Snackbar.LENGTH_SHORT).show();
         return true;
     }
 
     public boolean OnProjectsSelected() {
-        Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT);
+        Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
         return true;
     }
 
     public boolean OnSettingsSelected() {
-        Snackbar.make(mContentView, "Settings clicked", Snackbar.LENGTH_SHORT);
+        Snackbar.make(mContentView, "Settings clicked", Snackbar.LENGTH_SHORT).show();
         return true;
     }
 }
