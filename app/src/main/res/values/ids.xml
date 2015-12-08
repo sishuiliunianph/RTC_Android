@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="drawer_workitems" type="id">drawer_workitems</item>
+    <item name="drawer_projects" type="id">drawer_projects</item>
+    <item name="drawer_settings" type="id">drawer_settings</item>
+    <item name="drawer_about" type="id">drawer_id</item>
+    <item name="drawer_sign_out" type="id">drawer_sign_out</item>
+    <item name="toolbar" type="id">ToolBar</item>
+</resources>
