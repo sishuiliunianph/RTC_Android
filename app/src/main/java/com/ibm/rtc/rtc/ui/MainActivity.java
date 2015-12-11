@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.ibm.rtc.rtc.R;
+import com.ibm.rtc.rtc.account.Account;
+import com.ibm.rtc.rtc.account.AccountManager;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -21,6 +23,8 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.List;
 
 /**
  * Created by v-wajie on 2015/12/8.
@@ -39,6 +43,16 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //在创建的时候判断是否已经有登录的账号，如果没有就启动LoginActivity
+        AccountManager accountManager = AccountManager.getInstance(this);
+        List<Account> accounts = accountManager.getAccounts();
+
+        if (accounts == null || accounts.isEmpty()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         setContentView(R.layout.generic_toolbar);
         mContentView = findViewById(R.id.content);

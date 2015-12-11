@@ -2,11 +2,25 @@
 <items version="2" >
 
     <item
+        jar="C:\Users\v-wajie\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.5\686c608d1805b6d4d425ec4459e88164ffc85870\gson-2.5.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="686c608d1805b6d4d425ec4459e88164ffc85870">
+        <dex dex="F:\Learning\Android\RTC\app\build\intermediates\pre-dexed\debug\gson-2.5_753e5df479f6f0c76164ff41052d912dd35e6758.jar" />
+    </item>
+    <item
         jar="F:\Learning\Android\RTC\app\build\intermediates\incremental-classes\debug\classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="fbffc13b04d584183f02838e521be84556c2487c">
+        sha1="5f78ee02a6f8df2618d19f42f44623c1fc9779d7">
         <dex dex="F:\Learning\Android\RTC\app\build\intermediates\pre-dexed\debug\classes_15c15119a6d3a16ceeb1923048a35c32a91df34b.jar" />
+    </item>
+    <item
+        jar="F:\Learning\Android\RTC\app\libs\volley.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="1e08c0b7a142972b78416523540d019bf272a792">
+        <dex dex="F:\Learning\Android\RTC\app\build\intermediates\pre-dexed\debug\volley_baf99973eb3eaded96307f2cd74c10b6e95c9bc4.jar" />
     </item>
 
 </items>
