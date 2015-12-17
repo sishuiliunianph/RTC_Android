@@ -30,7 +30,7 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.3.7@aar') {
         transitive = true
     }
-    compile 'com.afollestad:material-dialogs:0.7.9.1'
     compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'com.github.xiprox.errorview:library:2.2.0'
     compile files('libs/volley.jar')
 }

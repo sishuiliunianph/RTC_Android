@@ -49,17 +49,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
-
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private boolean isLogining =false;
     private RequestQueue mRequestQueue;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-
     }
 
 
@@ -104,9 +99,11 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
+        //already in login state
+        if (isLogining) {
             return;
         }
+        isLogining = true;
 
         // Reset errors.
         mUsernameView.setError(null);
@@ -141,13 +138,21 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+
             String loginUrl = new UrlManager(this).getLoginUrl();
             final String AUTHENTICATE_ATTR = "authenticated";
+            JSONObject body = new JSONObject();
+            try {
+                body.put("username", username);
+                body.put("password", password);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, loginUrl,
-                  null, new Response.Listener<JSONObject>() {
+                  body, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-
+                    isLogining = false;
                     showProgress(false);
                     try {
                         if (response.getBoolean(AUTHENTICATE_ATTR)) {
@@ -168,31 +173,25 @@ public class LoginActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
-
+                    isLogining = false;
                     showProgress(false);
                     if (mLoginFormView != null) {
                         Snackbar.make(mLoginFormView, R.string.error_login_network,
                                 Snackbar.LENGTH_SHORT).show();
                     }
                 }
-            }) {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("username", username);
-                    params.put("password", password);
-                    return params;
-                }
-            };
+            });
             loginRequest.setTag(TAG);
             mRequestQueue.add(loginRequest);
         }
     }
 
     private void onLoginSuccess(String username, String password) {
+        mRequestQueue.cancelAll(TAG);
         AccountManager accountManager = AccountManager.getInstance(this);
         Account account = new Account(username, password);
         accountManager.saveAccount(account);
+
         Intent intent = new Intent();
         intent.setClass(this, MainActivity.class);
         startActivity(intent);
@@ -235,75 +234,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mUsername;
-        private final String mPassword;
-        private final String mLoginUrl;
-        final String AUTHENTICATE_ATTR = "authenticate";
-
-        UserLoginTask(String username, String password, String loginUrl) {
-            mUsername = username;
-            mPassword = password;
-            mLoginUrl = loginUrl;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("username", mUsername);
-                obj.put("password", mPassword);
-            } catch (JSONException e) {
-                Log.e(TAG, e.toString());
-            }
-
-            JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, mLoginUrl,
-                    obj, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        if (response.getBoolean(AUTHENTICATE_ATTR)) {
-
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-
-                }
-            });
-
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mRequestQueue.cancelAll(TAG);
+        mRequestQueue = null;
     }
 }
 
