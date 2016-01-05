@@ -31,5 +31,5 @@
 
     <!-- Workitem fragment -->
     <string name="workitem_title">Workitem Title</string>
-
+    <string name="workitem_refresh_error">Refresh Workitem List failed</string>
 </resources>

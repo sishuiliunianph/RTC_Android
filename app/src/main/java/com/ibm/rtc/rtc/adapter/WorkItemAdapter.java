@@ -14,7 +14,7 @@ import com.ibm.rtc.rtc.model.Workitem;
 /**
  * Created by Jack on 2015/12/17.
  */
-public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdapter.ViewHolder>{
+public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdapter.ViewHolder> {
 
     private boolean showOwnerName = true;
     private final Resources resources;
