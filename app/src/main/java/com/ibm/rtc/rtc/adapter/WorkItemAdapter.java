@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.model.Workitem;
+import com.ibm.rtc.rtc.ui.WorkitemActivity;
 
 /**
  * Created by Jack on 2015/12/17.
@@ -18,7 +19,6 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
 
     private boolean showOwnerName = true;
     private final Resources resources;
-    private WorkitemAdapterListener workitemAdapterListener;
 
     public WorkitemAdapter(Context context, LayoutInflater inflater) {
         super(inflater);
@@ -44,10 +44,6 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
         return new ViewHolder(getInflater().inflate(R.layout.row_workitem, parent, false));
     }
 
-    public interface WorkitemAdapterListener {
-        void onItem(Workitem workitem);
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textTitle;
         public TextView textOwner;
@@ -63,7 +59,11 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Workitem workitem = getItem(getAdapterPosition());
+                    if (workitem != null) {
+                        v.getContext().startActivity(
+                                WorkitemActivity.createLauncherIntent(v.getContext(), workitem));
+                    }
                 }
             });
         }

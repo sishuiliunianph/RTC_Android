@@ -1,5 +1,8 @@
 package com.ibm.rtc.rtc.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +16,7 @@ import java.util.List;
 /**
  * Created by Jack on 2015/12/17.
  */
-public class Workitem {
+public class Workitem implements Parcelable {
 
     public static final String TAG = "Workitem";
     private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -34,6 +37,8 @@ public class Workitem {
     private String commentsUrl;
     private String subscribersUrl;
     private String plannedFor;
+
+    public Workitem() {}
 
     public static List<Workitem> fromJSONArray(JSONArray jsonArray) throws JSONException, ParseException {
         List<Workitem> workitemList = new ArrayList<>();
@@ -205,4 +210,65 @@ public class Workitem {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(projectUuid);
+        dest.writeInt(id);
+        dest.writeString(description);
+        dest.writeString(type);
+        dest.writeString(filedAgainst);
+        dest.writeString(ownedBy);
+        dest.writeString(createdBy);
+        dest.writeLong(createdTime == null ? -1 : createdTime.getTime());
+        dest.writeLong(lastModifiedTime == null ? -1 : lastModifiedTime.getTime());
+        dest.writeLong(dueDate == null ? -1 : dueDate.getTime());
+        dest.writeString(title);
+        dest.writeString(priority);
+        dest.writeString(severity);
+        dest.writeString(commentsUrl);
+        dest.writeString(subscribersUrl);
+        dest.writeString(plannedFor);
+    }
+
+    public static final Parcelable.Creator<Workitem> CREATOR = new Parcelable.Creator<Workitem>() {
+
+        @Override
+        public Workitem createFromParcel(Parcel source) {
+            return new Workitem(source);
+        }
+
+        @Override
+        public Workitem[] newArray(int size) {
+            return new Workitem[size];
+        }
+    };
+
+    private Workitem(Parcel in) {
+        projectUuid = in.readString();
+        id = in.readInt();
+        description = in.readString();
+        type = in.readString();
+        filedAgainst = in.readString();
+        ownedBy = in.readString();
+        createdBy = in.readString();
+
+        Long peek;
+        createdTime = (peek = in.readLong()) >= 0 ? new Date(peek) : null;
+        lastModifiedTime = (peek = in.readLong()) >= 0 ? new Date(peek) : null;
+        dueDate = (peek = in.readLong()) >= 0 ? new Date(peek) : null;
+
+        title = in.readString();
+        priority = in.readString();
+        severity = in.readString();
+        commentsUrl = in.readString();
+        subscribersUrl = in.readString();
+        plannedFor = in.readString();
+    }
+
 }
