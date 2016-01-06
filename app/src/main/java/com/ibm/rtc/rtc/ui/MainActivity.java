@@ -1,12 +1,13 @@
 package com.ibm.rtc.rtc.ui;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,8 @@ import android.view.View;
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.account.Account;
 import com.ibm.rtc.rtc.account.AccountManager;
+import com.ibm.rtc.rtc.ui.fragment.ProjectsListFragment;
+import com.ibm.rtc.rtc.ui.fragment.WorkitemsListFragment;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
     private Drawer mDrawer;
     private View mContentView;
     private WorkitemsListFragment mWorkitemsListFragment;
+    private ProjectsListFragment mProjectsListFragment;
     private Fragment mLastUsedFragment;
 
     public static void startActivity(Activity context) {
@@ -170,12 +174,26 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
             mWorkitemsListFragment = new WorkitemsListFragment();
         }
         setFragment(mWorkitemsListFragment, false);
+        setTitle(R.string.workitem_list_title);
         return true;
     }
 
     public boolean onProjectsSelected() {
-        Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
+        //Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
+        if (mProjectsListFragment == null) {
+            mProjectsListFragment = new ProjectsListFragment();
+        }
+        clearFragments();
+        setFragment(mProjectsListFragment, false);
+        setTitle(R.string.project_list_title);
         return true;
+    }
+
+    private void clearFragments() {
+        mWorkitemsListFragment = null;
+        if (getSupportFragmentManager() != null) {
+            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 
     public boolean onSettingsSelected() {

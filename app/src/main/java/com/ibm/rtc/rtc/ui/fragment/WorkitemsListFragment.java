@@ -1,10 +1,9 @@
-package com.ibm.rtc.rtc.ui;
+package com.ibm.rtc.rtc.ui.fragment;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,6 +24,7 @@ import java.util.List;
 public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> {
     private static final String TAG = "WorkitemsListFragment";
     private RequestQueue mRequestQueue;
+    private final int DEFAULT_STATUS_CODE = 500;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,22 +33,10 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         mRequestQueue = VolleyQueue.getInstance(getActivity()).getRequestQueue();
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        addNewAdapter();
-    }
-
-    private void addNewAdapter() {
-        WorkitemAdapter workitemAdapter = new WorkitemAdapter(getActivity(),
-                LayoutInflater.from(getActivity()));
-        workitemAdapter.setRecyclerAdapterContentListener(this);
-        setAdapter(workitemAdapter);
-    }
-
     public void setUpList(List<Workitem> workitems) {
         WorkitemAdapter adapter = new WorkitemAdapter(getActivity(),
                 LayoutInflater.from(getActivity()));
+        adapter.setRecyclerAdapterContentListener(this);
         adapter.addAll(workitems);
 
         setAdapter(adapter);
@@ -81,8 +69,9 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                     Log.d(TAG, "Fetch workitems error: " + volleyError.getMessage());
                     stopRefresh();
 
-                    if (volleyError.networkResponse != null)
-                        setEmpty(true, volleyError.networkResponse.statusCode);
+                    setEmpty(true, volleyError.networkResponse == null ?
+                        DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
+
                     if (getView() != null)
                         Snackbar.make(getView(), getText(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
                 }
