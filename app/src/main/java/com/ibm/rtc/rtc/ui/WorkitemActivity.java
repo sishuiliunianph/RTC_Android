@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.TitleProvider;
+import com.ibm.rtc.rtc.ui.fragment.WorkitemCommentsFragment;
+import com.ibm.rtc.rtc.ui.fragment.WorkitemDetailFragment;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.typeface.IIcon;
 
@@ -91,7 +93,8 @@ public class WorkitemActivity extends AppCompatActivity {
 
     private void addFragments() {
         mFragments = new ArrayList<>();
-
+        mFragments.add(WorkitemDetailFragment.newIntance(mWorkitem));
+        mFragments.add(WorkitemCommentsFragment.newIntance(mWorkitem));
     }
 
     private void showTabsIcons(TabLayout tabLayout) {
@@ -123,7 +126,6 @@ public class WorkitemActivity extends AppCompatActivity {
     }
 
     private class NavigationAdapter extends FragmentPagerAdapter {
-
         private List<Fragment> fragments;
 
         public NavigationAdapter(FragmentManager fm, List<Fragment> fragments) {

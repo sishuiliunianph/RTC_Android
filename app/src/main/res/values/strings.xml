@@ -36,8 +36,14 @@
     <string name="workitem_list_title">Workitems</string>
 
 
-    <!-- Project list fragment-->
+    <!-- Project list fragment -->
     <string name="project_list_title">Projects</string>
     <string name="no_projects">No projects</string>
     <string name="project_refresh_error">Refresh project List failed</string>
+
+    <!-- Workitem detail fragment -->
+    <string name="workitem_detail_title">Detail</string>
+
+    <!-- Workitem comments fragment -->
+    <string name="workitem_comment_title">Comments</string>
 </resources>

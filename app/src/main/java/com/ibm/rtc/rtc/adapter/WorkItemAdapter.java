@@ -3,6 +3,7 @@ package com.ibm.rtc.rtc.adapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,7 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
         }
 
         //TODO 为workitem添加其他字段。
-        holder.textDescription.setText(item.getDescription());
+        holder.textDescription.setText(Html.fromHtml(item.getDescription()));
     }
 
     @Override
