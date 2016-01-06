@@ -32,5 +32,6 @@ dependencies {
     }
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'com.github.xiprox.errorview:library:2.2.0'
+    compile 'com.mikepenz:octicons-typeface:3.0.1@aar'
     compile files('libs/volley.jar')
 }

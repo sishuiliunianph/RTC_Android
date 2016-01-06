@@ -49,20 +49,34 @@ public class Workitem {
         Workitem workitem = new Workitem();
         workitem.setId(object.getInt("id"));
         workitem.setProjectUuid(object.getString("projectUuid"));
-        workitem.setSubscribersUrl(object.getString("subscriberUrl"));
+        workitem.setSubscribersUrl(object.getString("subscribersUrl"));
         workitem.setDescription(object.getString("description"));
         workitem.setTitle(object.getString("title"));
         workitem.setSeverity(object.getJSONObject("severity").getString("title"));
         workitem.setPriority(object.getJSONObject("priority").getString("title"));
-        workitem.setCreatedBy(object.getJSONObject("createdBy").getString("title"));
-        workitem.setOwnedBy(object.getJSONObject("ownedBy").getString("title"));
+        workitem.setCreatedBy(object.getJSONObject("createdBy").getString("name"));
+        workitem.setOwnedBy(object.getJSONObject("ownedBy").getString("name"));
         workitem.setFiledAgainst(object.getJSONObject("filedAgainst").getString("title"));
         workitem.setType(object.getJSONObject("type").getString("title"));
-        workitem.setDueDate(dateFormat.parse(object.getString("dueDate")));
-        workitem.setCreatedTime(dateFormat.parse(object.getString("createdTime")));
-        workitem.setLastModifiedTime(dateFormat.parse(object.getString("lastModifiedTime")));
+
+        if (!object.getString("dueDate").equals("null")) {
+            workitem.setDueDate(dateFormat.parse(object.getString("dueDate")));
+        } else {
+            workitem.setDueDate(null);
+        }
+        if (!object.getString("createdTime").equals("null")) {
+            workitem.setCreatedTime(dateFormat.parse(object.getString("createdTime")));
+        } else {
+            workitem.setCreatedTime(null);
+        }
+        if (!object.getString("lastModifiedTime").equals("null")) {
+            workitem.setLastModifiedTime(dateFormat.parse(object.getString("lastModifiedTime")));
+        } else {
+            workitem.setLastModifiedTime(null);
+        }
         return workitem;
     }
+
 
     public String getProjectUuid() {
         return projectUuid;

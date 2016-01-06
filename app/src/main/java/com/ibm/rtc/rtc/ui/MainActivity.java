@@ -25,6 +25,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.octicons_typeface_library.Octicons;
 
 import java.util.List;
 
@@ -65,6 +66,20 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (mToolbar != null) {
+            mToolbar.setTitle("RTC");
+            setSupportActionBar(mToolbar);
+        }
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        if (mToolbar != null) {
+            mToolbar.setTitle(title);
+        } else {
+            super.setTitle(title);
+        }
     }
 
     @Override
@@ -81,14 +96,15 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         AccountHeader accountHeader = builderHeader();
         //create the Drawer
         DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(this)
-                .withToolbar(getmToolbar())
+                .withToolbar(getToolbar())
                 .withAccountHeader(accountHeader);
         drawerBuilder.addDrawerItems(new PrimaryDrawerItem().withName(R.string.drawer_menu_workitems)
-                        .withIcon(R.mipmap.ic_launcher)
+                        .withIcon(Octicons.Icon.oct_list_unordered)
                         .withIdentifier(R.id.drawer_workitems), new PrimaryDrawerItem().withName(R.string.drawer_menu_projects)
-                        .withIcon(R.mipmap.ic_launcher)
+                        .withIcon(Octicons.Icon.oct_server)
                         .withIdentifier(R.id.drawer_projects), new DividerDrawerItem(), new SecondaryDrawerItem()
                         .withName(R.string.drawer_menu_settings)
+                        .withIcon(Octicons.Icon.oct_settings)
                         .withIdentifier(R.id.drawer_settings));
 
         drawerBuilder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -98,13 +114,13 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
                     int identifier = drawerItem.getIdentifier();
                     switch (identifier) {
                         case R.id.drawer_workitems:
-                            OnWorkitemsSelected();
+                            onWorkitemsSelected();
                             break;
                         case R.id.drawer_projects:
-                            OnProjectsSelected();
+                            onProjectsSelected();
                             break;
                         case R.id.drawer_settings:
-                            OnSettingsSelected();
+                            onSettingsSelected();
                             break;
                     }
                 }
@@ -140,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         return headerBuilder.build();
     }
 
-    public Toolbar getmToolbar() {
+    public Toolbar getToolbar() {
         return mToolbar;
     }
 
@@ -149,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         return false;
     }
 
-    public boolean OnWorkitemsSelected() {
+    public boolean onWorkitemsSelected() {
         if (mWorkitemsListFragment == null) {
             mWorkitemsListFragment = new WorkitemsListFragment();
         }
@@ -157,12 +173,12 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         return true;
     }
 
-    public boolean OnProjectsSelected() {
+    public boolean onProjectsSelected() {
         Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
         return true;
     }
 
-    public boolean OnSettingsSelected() {
+    public boolean onSettingsSelected() {
         Snackbar.make(mContentView, "Settings clicked", Snackbar.LENGTH_SHORT).show();
         return true;
     }
@@ -182,6 +198,20 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawer != null && mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
+        } else {
+            if (mLastUsedFragment instanceof WorkitemsListFragment) {
+                finish();
+            } else if (mDrawer != null) {
+                mDrawer.setSelection(R.id.drawer_workitems);
+                onWorkitemsSelected();
+            }
         }
     }
 }

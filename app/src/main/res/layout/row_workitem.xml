@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             tools:text="Repository name"
             android:id="@+id/title"
-            style="@style/TextAppearance.AppCompat.Headline"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:textColor="?colorPrimaryDark"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"

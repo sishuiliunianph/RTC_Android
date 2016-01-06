@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -32,6 +33,19 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         mRequestQueue = VolleyQueue.getInstance(getActivity()).getRequestQueue();
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        addNewAdapter();
+    }
+
+    private void addNewAdapter() {
+        WorkitemAdapter workitemAdapter = new WorkitemAdapter(getActivity(),
+                LayoutInflater.from(getActivity()));
+        workitemAdapter.setRecyclerAdapterContentListener(this);
+        setAdapter(workitemAdapter);
+    }
+
     public void setUpList(List<Workitem> workitems) {
         WorkitemAdapter adapter = new WorkitemAdapter(getActivity(),
                 LayoutInflater.from(getActivity()));
@@ -45,7 +59,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         super.executeRequest();
 
         UrlManager urlManager = new UrlManager(getActivity());
-        String workitemsUrl = urlManager.getRootUrl() + "/workitems";
+        String workitemsUrl = urlManager.getRootUrl() + "workitems";
         WorkitemsRequest workitemsRequest = new WorkitemsRequest(workitemsUrl,
             new Response.Listener<List<Workitem>>() {
                 @Override
@@ -55,6 +69,8 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                         if (refreshing || getAdapter() == null) {
                             setUpList(workitems);
                         }
+                    } else {
+                        setEmpty();
                     }
                     stopRefresh();
                 }
@@ -64,12 +80,20 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                 public void onErrorResponse(VolleyError volleyError) {
                     Log.d(TAG, "Fetch workitems error: " + volleyError.getMessage());
                     stopRefresh();
+
+                    if (volleyError.networkResponse != null)
+                        setEmpty(true, volleyError.networkResponse.statusCode);
                     if (getView() != null)
                         Snackbar.make(getView(), getText(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
                 }
             });
         workitemsRequest.setTag(TAG);
         mRequestQueue.add(workitemsRequest);
+    }
+
+    @Override
+    protected int getNoDataText() {
+        return R.string.no_workitems;
     }
 
     @Override

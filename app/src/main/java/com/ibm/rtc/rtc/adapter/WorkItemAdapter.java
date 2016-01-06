@@ -36,7 +36,7 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
         }
 
         //TODO 为workitem添加其他字段。
-        holder.textDescription.setVisibility(View.INVISIBLE);
+        holder.textDescription.setText(item.getDescription());
     }
 
     @Override
