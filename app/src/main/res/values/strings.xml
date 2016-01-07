@@ -43,6 +43,11 @@
 
     <!-- Workitem detail fragment -->
     <string name="workitem_detail_title">Detail</string>
+    <string name="workitem_summary">Summary: </string>
+    <string name="workitem_description">Description</string>
+    <string name="blank_description">This Workitem does not have a description.</string>
+    <string name="workitem_type">Type: </string>
+    <string name="workitem_id">ID: </string>
 
     <!-- Workitem comments fragment -->
     <string name="workitem_comment_title">Comments</string>

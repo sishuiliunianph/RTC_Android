@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:showIn="@layout/fragment_workitem_detail">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/workitem_detail_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/summary_title"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:text="@string/workitem_summary"
+            android:fontFamily="sans-serif-medium"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:textAllCaps="true" />
+        <TextView
+            android:id="@+id/summary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/summary_title"
+            android:layout_toRightOf="@+id/summary_title"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical|left"
+            android:maxLines="2"
+            style="@style/TextAppearance.AppCompat.Medium"
+            tools:ignore="ObsoleteLayoutParam,RtlHardcoded,UnusedAttribute"
+            tools:text="Summary content" />
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/workitem_detail_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/type_title"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:text="@string/workitem_type"
+                android:fontFamily="sans-serif-medium"
+                android:singleLine="true"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textAllCaps="true" />
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/type_title"
+                android:layout_toRightOf="@+id/type_title"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical|left"
+                android:singleLine="true"
+                style="@style/TextAppearance.AppCompat.Medium"
+                tools:ignore="ObsoleteLayoutParam,RtlHardcoded,UnusedAttribute"
+                tools:text="Type" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/id_title"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:layout_toRightOf="@+id/type_title"
+                android:text="@string/workitem_id"
+                android:singleLine="true"
+                android:fontFamily="sans-serif-medium"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textAllCaps="true" />
+            <TextView
+                android:id="@+id/workitem_id"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/id_title"
+                android:layout_toRightOf="@+id/id_title"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical|left"
+                android:singleLine="true"
+                style="@style/TextAppearance.AppCompat.Medium"
+                tools:ignore="ObsoleteLayoutParam,RtlHardcoded,UnusedAttribute"
+                tools:text="ID" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</merge>

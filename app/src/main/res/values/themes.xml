@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Default application theme. -->
+    <!-- Default application theme. NoActionBar 使得自定义的toolBar可用 -->
     <style name="AppTheme.AppCompat.Default" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/primary</item>

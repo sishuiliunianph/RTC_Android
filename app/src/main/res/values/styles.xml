@@ -1,11 +1,13 @@
 <resources>
+    <style name="workitem_detail_item">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:orientation">horizontal</item>
+        <!--<item name="android:padding">@dimen/material_drawer_padding</item>-->
+        <item name="android:paddingLeft">@dimen/material_drawer_padding</item>
+        <item name="android:paddingRight">@dimen/material_drawer_padding</item>
+        <!--<item name="android:paddingStart">@dimen/material_drawer_padding</item>-->
+    </style>
 
-    <!-- Base application theme. -->
-    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        &lt;!&ndash; Customize your theme here. &ndash;&gt;
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>-->
 
 </resources>

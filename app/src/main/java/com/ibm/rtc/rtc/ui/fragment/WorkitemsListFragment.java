@@ -69,6 +69,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                     Log.d(TAG, "Fetch workitems error: " + volleyError.getMessage());
                     stopRefresh();
 
+                    //TODO 设置合适的错误类型信息
                     setEmpty(true, volleyError.networkResponse == null ?
                         DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
 
