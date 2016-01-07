@@ -14,6 +14,7 @@ import com.ibm.rtc.rtc.model.Project;
  */
 public class ProjectAdapter extends RecyclerArrayAdapter<Project, ProjectAdapter.ViewHolder> {
 
+    private ProjectItemSelectedListener projectItemSelectedListener;
 
     public ProjectAdapter(LayoutInflater inflater) {
         super(inflater);
@@ -32,6 +33,14 @@ public class ProjectAdapter extends RecyclerArrayAdapter<Project, ProjectAdapter
         return new ViewHolder(getInflater().inflate(R.layout.row_project, parent, false));
     }
 
+    public interface ProjectItemSelectedListener {
+        void onProjectItemSelected(Project project);
+    }
+
+    public void setProjectItemSelectedListener(ProjectItemSelectedListener projectItemSelectedListener) {
+        this.projectItemSelectedListener = projectItemSelectedListener;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textTitle;
         public TextView textUUID;
@@ -47,7 +56,11 @@ public class ProjectAdapter extends RecyclerArrayAdapter<Project, ProjectAdapter
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Project project = getItem(getAdapterPosition());
 
+                    if (projectItemSelectedListener != null) {
+                        projectItemSelectedListener.onProjectItemSelected(project);
+                    }
                 }
             });
         }

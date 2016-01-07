@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -13,8 +16,11 @@ import com.ibm.rtc.rtc.adapter.WorkitemAdapter;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.VolleyQueue;
 import com.ibm.rtc.rtc.core.WorkitemsRequest;
+import com.ibm.rtc.rtc.model.Project;
 import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.LoadingListFragment;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
 
@@ -23,14 +29,63 @@ import java.util.List;
  */
 public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> {
     private static final String TAG = "WorkitemsListFragment";
+    private static final String PROJECT_INFO = "PROJECT_INFO";
     private RequestQueue mRequestQueue;
+    private Project mProject;
     private final int DEFAULT_STATUS_CODE = 500;
+
+    public static WorkitemsListFragment newInstance(Project project) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(PROJECT_INFO, project);
+        WorkitemsListFragment workitemsListFragment = new WorkitemsListFragment();
+        workitemsListFragment.setArguments(bundle);
+        return workitemsListFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+        loadArguments();
         mRequestQueue = VolleyQueue.getInstance(getActivity()).getRequestQueue();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.workitem_list_fragment, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (getActivity() != null) {
+            MenuItem item = menu.findItem(R.id.workitem_filter);
+            if (item != null) {
+                item.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_filter_list)
+                    .colorRes(R.color.white).actionBar());
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.workitem_filter:
+                break;
+        }
+
+        return true;
+    }
+
+    private void loadArguments() {
+        if (getArguments() != null) {
+            mProject = getArguments().getParcelable(PROJECT_INFO);
+        }
     }
 
     public void setUpList(List<Workitem> workitems) {

@@ -21,13 +21,14 @@ import com.mikepenz.octicons_typeface_library.Octicons;
 public class WorkitemDetailFragment extends WorkitembaseFragment implements TitleProvider {
     private static final String TAG = "WorkitemDetailFragment";
 
-
     private TextView summary;
     private TextView description;
     private TextView type;
     private TextView id;
+    private TextView priority;
+    private TextView severity;
 
-    public static WorkitemDetailFragment newIntance(Workitem workitem) {
+    public static WorkitemDetailFragment newInstance(Workitem workitem) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(WORKITEM_INFO, workitem);
         WorkitemDetailFragment detailFragment = new WorkitemDetailFragment();
@@ -50,6 +51,8 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         description = (TextView) view.findViewById(R.id.description);
         type = (TextView) view.findViewById(R.id.type);
         id = (TextView) view.findViewById(R.id.workitem_id);
+        priority = (TextView) view.findViewById(R.id.priority);
+        severity = (TextView) view.findViewById(R.id.severity);
 
         setDisplayContent();
     }
@@ -59,6 +62,8 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         description.setText(Html.fromHtml(getWorkitemDescription()));
         type.setText(getWorkitem().getType());
         id.setText(String.valueOf(getWorkitem().getId()));
+        priority.setText(getWorkitem().getPriority());
+        priority.setText(getWorkitem().getSeverity());
     }
 
     private String getWorkitemDescription() {

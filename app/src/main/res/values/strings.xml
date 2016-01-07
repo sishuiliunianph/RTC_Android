@@ -34,6 +34,7 @@
     <string name="workitem_refresh_error">Refresh Workitem List failed</string>
     <string name="no_workitems">No workitems</string>
     <string name="workitem_list_title">Workitems</string>
+    <string name="workitem_filter">Workitem Filter</string>
 
 
     <!-- Project list fragment -->
@@ -48,6 +49,8 @@
     <string name="blank_description">This Workitem does not have a description.</string>
     <string name="workitem_type">Type: </string>
     <string name="workitem_id">ID: </string>
+    <string name="workitem_priority">Priority: </string>
+    <string name="workitem_severity">Severity: </string>
 
     <!-- Workitem comments fragment -->
     <string name="workitem_comment_title">Comments</string>

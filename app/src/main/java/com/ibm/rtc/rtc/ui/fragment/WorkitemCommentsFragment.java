@@ -15,7 +15,7 @@ import com.mikepenz.octicons_typeface_library.Octicons;
 public class WorkitemCommentsFragment extends WorkitembaseFragment implements TitleProvider {
 
 
-    public static WorkitemCommentsFragment newIntance(Workitem workitem) {
+    public static WorkitemCommentsFragment newInstance(Workitem workitem) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(WORKITEM_INFO, workitem);
 

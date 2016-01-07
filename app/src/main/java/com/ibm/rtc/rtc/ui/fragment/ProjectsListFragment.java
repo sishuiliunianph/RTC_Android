@@ -22,8 +22,11 @@ import java.util.List;
 /**
  * Created by v-wajie on 1/6/2016.
  */
-public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter> {
+public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter>
+        implements ProjectAdapter.ProjectItemSelectedListener {
     private static final String TAG = "ProjectsListFragment";
+
+    private ProjectSwitchLisenter projectSwitchLisenter;
     private RequestQueue mRequestQueue;
     private final int DEFAULT_STATUS_CODE = 500;
 
@@ -37,6 +40,7 @@ public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter> {
     public void setUpList(List<Project> projects) {
         ProjectAdapter adapter = new ProjectAdapter(LayoutInflater.from(getActivity()));
         adapter.setRecyclerAdapterContentListener(this);
+        adapter.setProjectItemSelectedListener(this);
         adapter.addAll(projects);
 
         setAdapter(adapter);
@@ -88,5 +92,20 @@ public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter> {
     public void onStop() {
         super.onStop();
         mRequestQueue.cancelAll(TAG);
+    }
+
+    @Override
+    public void onProjectItemSelected(Project project) {
+        if (projectSwitchLisenter != null) {
+            projectSwitchLisenter.onProjectSwitch(project);
+        }
+    }
+
+    public void setProjectSwitchLisenter(ProjectSwitchLisenter projectSwitchLisenter) {
+        this.projectSwitchLisenter = projectSwitchLisenter;
+    }
+
+    public interface ProjectSwitchLisenter {
+        public void onProjectSwitch(Project project);
     }
 }

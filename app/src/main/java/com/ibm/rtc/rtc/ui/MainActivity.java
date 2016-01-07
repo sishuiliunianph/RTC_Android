@@ -2,7 +2,9 @@ package com.ibm.rtc.rtc.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,9 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.google.gson.Gson;
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.account.Account;
 import com.ibm.rtc.rtc.account.AccountManager;
+import com.ibm.rtc.rtc.model.Project;
 import com.ibm.rtc.rtc.ui.fragment.ProjectsListFragment;
 import com.ibm.rtc.rtc.ui.fragment.WorkitemsListFragment;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -35,7 +39,10 @@ import java.util.List;
 /**
  * Created by v-wajie on 2015/12/8.
  */
-public class MainActivity extends AppCompatActivity implements AccountHeader.OnAccountHeaderListener {
+public class MainActivity extends AppCompatActivity
+        implements AccountHeader.OnAccountHeaderListener, ProjectsListFragment.ProjectSwitchLisenter{
+    private static final String TAG = "MainActivity";
+    private static final String CURRENT_PROJECT = "CurrentProject";
 
     private Toolbar mToolbar;
     private Drawer mDrawer;
@@ -43,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
     private WorkitemsListFragment mWorkitemsListFragment;
     private ProjectsListFragment mProjectsListFragment;
     private Fragment mLastUsedFragment;
+    private Project mCurrentProject;
 
     public static void startActivity(Activity context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -93,6 +101,20 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         if (mDrawer == null) {
             createDrawer();
         }
+        //get the last used project.
+        if (mCurrentProject == null) {
+            String jsonText = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString(CURRENT_PROJECT, null);
+            if (jsonText != null) {
+                Gson gson = new Gson();
+                mCurrentProject = gson.fromJson(jsonText, Project.class);
+                //set the workitem list as the default view.
+                mDrawer.setSelection(R.id.drawer_workitems);
+            } else {
+                //no used project, pop up the project list
+                onProjectsSelected();
+            }
+        }
     }
 
     private void createDrawer() {
@@ -134,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         });
 
         mDrawer = drawerBuilder.build();
-        mDrawer.setSelection(R.id.drawer_workitems);
     }
 
     private AccountHeader builderHeader() {
@@ -171,7 +192,10 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
 
     public boolean onWorkitemsSelected() {
         if (mWorkitemsListFragment == null) {
-            mWorkitemsListFragment = new WorkitemsListFragment();
+            if (mCurrentProject == null) {
+                throw new IllegalStateException("CurrentProject must not be null");
+            }
+            mWorkitemsListFragment = WorkitemsListFragment.newInstance(mCurrentProject);
         }
         setFragment(mWorkitemsListFragment, false);
         setTitle(R.string.workitem_list_title);
@@ -182,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
         //Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
         if (mProjectsListFragment == null) {
             mProjectsListFragment = new ProjectsListFragment();
+            mProjectsListFragment.setProjectSwitchLisenter(this);
         }
         clearFragments();
         setFragment(mProjectsListFragment, false);
@@ -230,6 +255,20 @@ public class MainActivity extends AppCompatActivity implements AccountHeader.OnA
                 mDrawer.setSelection(R.id.drawer_workitems);
                 onWorkitemsSelected();
             }
+        }
+    }
+
+    @Override
+    public void onProjectSwitch(Project project) {
+        if (mCurrentProject == null || !mCurrentProject.getUuid().equals(project.getUuid())) {
+            mCurrentProject = project;
+            onWorkitemsSelected();
+            Gson gson = new Gson();
+            String jsonText = gson.toJson(mCurrentProject);
+            SharedPreferences.Editor editor =
+                    PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putString(CURRENT_PROJECT, jsonText);
+            editor.apply();
         }
     }
 }

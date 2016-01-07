@@ -93,8 +93,8 @@ public class WorkitemActivity extends AppCompatActivity {
 
     private void addFragments() {
         mFragments = new ArrayList<>();
-        mFragments.add(WorkitemDetailFragment.newIntance(mWorkitem));
-        mFragments.add(WorkitemCommentsFragment.newIntance(mWorkitem));
+        mFragments.add(WorkitemDetailFragment.newInstance(mWorkitem));
+        mFragments.add(WorkitemCommentsFragment.newInstance(mWorkitem));
     }
 
     private void showTabsIcons(TabLayout tabLayout) {
