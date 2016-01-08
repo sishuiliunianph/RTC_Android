@@ -9,4 +9,12 @@
         android:orderInCategory="150">
     </item>
 
+    <item
+        android:title="@string/workitem_sort"
+        android:id="@+id/workitem_sort"
+        app:showAsAction="always"
+        android:orderInCategory="200">
+    </item>
+
+
 </menu>

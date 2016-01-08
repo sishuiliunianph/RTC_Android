@@ -28,7 +28,7 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
 
     @Override
     protected void onBindViewHolder(ViewHolder holder, Workitem item) {
-        holder.textTitle.setText(item.getTitle());
+        holder.textTitle.setText(item.getId() + ": " + item.getTitle());
 
         if (showOwnerName) {
             holder.textOwner.setText(item.getOwnedBy());

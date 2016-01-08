@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity
                 mDrawer.setSelection(R.id.drawer_workitems);
             } else {
                 //no used project, pop up the project list
-                onProjectsSelected();
+                mDrawer.setSelection(R.id.drawer_projects);
             }
         }
     }
@@ -191,14 +191,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean onWorkitemsSelected() {
+        if (mCurrentProject == null) {
+            Snackbar.make(this.mContentView,
+                    getString(R.string.please_select_project), Snackbar.LENGTH_SHORT).show();
+            mDrawer.setSelection(R.id.drawer_projects);
+            return false;
+            //throw new IllegalStateException("CurrentProject must not be null");
+        }
+
         if (mWorkitemsListFragment == null) {
-            if (mCurrentProject == null) {
-                throw new IllegalStateException("CurrentProject must not be null");
-            }
             mWorkitemsListFragment = WorkitemsListFragment.newInstance(mCurrentProject);
         }
         setFragment(mWorkitemsListFragment, false);
-        setTitle(R.string.workitem_list_title);
+        setTitle(getString(R.string.workitem_list_title) + mCurrentProject.getTitle());
         return true;
     }
 
@@ -262,7 +267,7 @@ public class MainActivity extends AppCompatActivity
     public void onProjectSwitch(Project project) {
         if (mCurrentProject == null || !mCurrentProject.getUuid().equals(project.getUuid())) {
             mCurrentProject = project;
-            onWorkitemsSelected();
+            mDrawer.setSelection(R.id.drawer_workitems);
             Gson gson = new Gson();
             String jsonText = gson.toJson(mCurrentProject);
             SharedPreferences.Editor editor =

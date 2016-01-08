@@ -1,5 +1,7 @@
 package com.ibm.rtc.rtc.ui.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -7,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.adapter.WorkitemAdapter;
 import com.ibm.rtc.rtc.core.UrlManager;
@@ -18,10 +23,16 @@ import com.ibm.rtc.rtc.core.VolleyQueue;
 import com.ibm.rtc.rtc.core.WorkitemsRequest;
 import com.ibm.rtc.rtc.model.Project;
 import com.ibm.rtc.rtc.model.Workitem;
+import com.ibm.rtc.rtc.ui.base.FilterChoice;
 import com.ibm.rtc.rtc.ui.base.LoadingListFragment;
+import com.ibm.rtc.rtc.ui.base.SortChoice;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -30,8 +41,13 @@ import java.util.List;
 public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> {
     private static final String TAG = "WorkitemsListFragment";
     private static final String PROJECT_INFO = "PROJECT_INFO";
+    private static final String FILTERS = "FILTERS";
+    private static final String SORT = "SORT";
+
     private RequestQueue mRequestQueue;
     private Project mProject;
+    private ArrayList<Integer> mFilterIds;
+    private ArrayList<String> mFilterNames;
     private final int DEFAULT_STATUS_CODE = 500;
 
     public static WorkitemsListFragment newInstance(Project project) {
@@ -47,7 +63,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-        loadArguments();
+        loadArgumentsForProject();
         mRequestQueue = VolleyQueue.getInstance(getActivity()).getRequestQueue();
     }
 
@@ -62,9 +78,14 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         super.onPrepareOptionsMenu(menu);
 
         if (getActivity() != null) {
-            MenuItem item = menu.findItem(R.id.workitem_filter);
-            if (item != null) {
-                item.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_filter_list)
+            MenuItem itemFilter = menu.findItem(R.id.workitem_filter);
+            if (itemFilter != null) {
+                itemFilter.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_filter_list)
+                    .colorRes(R.color.white).actionBar());
+            }
+            MenuItem itemSort = menu.findItem(R.id.workitem_sort);
+            if (itemSort != null) {
+                itemSort.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_sort)
                     .colorRes(R.color.white).actionBar());
             }
         }
@@ -76,15 +97,108 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
 
         switch (item.getItemId()) {
             case R.id.workitem_filter:
+                onMenuItemFilterSelected();
+                break;
+            case R.id.workitem_sort:
+                onMenuItemSortSelected();
                 break;
         }
 
         return true;
     }
 
-    private void loadArguments() {
+    private void onMenuItemFilterSelected() {
+        FilterChoice[] choices = FilterChoice.values();
+        //don't show the Unhandled option
+        String[] names = new String[choices.length - 1];
+        for (int i = 0; i < choices.length; ++i) {
+            if (choices[i] != FilterChoice.Unhandled)
+                names[i] = choices[i].name();
+        }
+
+        Integer[] ids = null;
+        if (mFilterIds != null) {
+            ids = mFilterIds.toArray(new Integer[mFilterIds.size()]);
+        }
+
+        new MaterialDialog.Builder(getActivity()).items(names)
+                .itemsCallbackMultiChoice(ids, new MaterialDialog.ListCallbackMultiChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
+                        WorkitemsListFragment.this.mFilterIds = new ArrayList<>(Arrays.asList(which));
+                        List<String> filters = new ArrayList<String>();
+                        for (int i = 0; i < text.length; ++i) {
+                            filters.add(String.valueOf(text[i]));
+                        }
+
+                        WorkitemsListFragment.this.mFilterNames = new ArrayList<String>(filters);
+                        saveFilter();
+                        executeRequest();
+                        return false;
+                    }
+                })
+                .positiveText(getString(R.string.dialog_ok_button))
+                .neutralText(getString(R.string.dialog_clear_filter_button)).callback(new MaterialDialog.ButtonCallback() {
+            @Override
+            public void onNeutral(MaterialDialog dialog) {
+                super.onNeutral(dialog);
+                WorkitemsListFragment.this.mFilterIds = null;
+                WorkitemsListFragment.this.mFilterNames = null;
+                clearSavedFilter();
+                executeRequest();
+            }
+        }).show();
+    }
+
+    private void onMenuItemSortSelected() {
+        SortChoice[] choices = SortChoice.values();
+        //don't show the Unhandled option
+        String[] names = new String[choices.length - 1];
+        for (int i = 0; i < choices.length; ++i) {
+            if (choices[i] != SortChoice.Unhandled)
+                names[i] = choices[i].name();
+        }
+
+        Integer selectedId = 0;
+        new MaterialDialog.Builder(getActivity()).items(names)
+                .itemsCallbackSingleChoice(selectedId, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        return false;
+                    }
+                }).show();
+    }
+
+    private void saveFilter() {
+        if (mFilterIds != null && mFilterNames != null) {
+            SharedPreferences sharedPreferences = getActivity()
+                    .getSharedPreferences(FILTERS, Context.MODE_PRIVATE);
+
+            Gson gson = new Gson();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("WORKITEM_FILTER", gson.toJson(mFilterNames));
+            editor.putString("WORKITEM_FILTER_IDS", gson.toJson(mFilterIds));
+            editor.apply();
+        }
+    }
+
+    private void clearSavedFilter() {
+        SharedPreferences shared = getActivity()
+                .getSharedPreferences(FILTERS, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor edit = shared.edit();
+        edit.remove("WORKITEM_FILTER");
+        edit.remove("WORKITEM_FILTER_IDS");
+        edit.apply();
+    }
+
+
+
+    private void loadArgumentsForProject() {
         if (getArguments() != null) {
             mProject = getArguments().getParcelable(PROJECT_INFO);
+        } else {
+            throw new IllegalStateException("Project must not be null");
         }
     }
 
@@ -92,6 +206,16 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         WorkitemAdapter adapter = new WorkitemAdapter(getActivity(),
                 LayoutInflater.from(getActivity()));
         adapter.setRecyclerAdapterContentListener(this);
+
+
+        //默认以id升序
+        Collections.sort(workitems, new Comparator<Workitem>() {
+            @Override
+            public int compare(Workitem lhs, Workitem rhs) {
+                return lhs.getId() < rhs.getId() ? -1 :
+                        lhs.getId() > rhs.getId() ? 1 : 0;
+            }
+        });
         adapter.addAll(workitems);
 
         setAdapter(adapter);
@@ -102,7 +226,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         super.executeRequest();
 
         UrlManager urlManager = new UrlManager(getActivity());
-        String workitemsUrl = urlManager.getRootUrl() + "workitems";
+        String workitemsUrl = urlManager.getRootUrl() + "workitems?uuid=" + mProject.getUuid();
         WorkitemsRequest workitemsRequest = new WorkitemsRequest(workitemsUrl,
             new Response.Listener<List<Workitem>>() {
                 @Override
