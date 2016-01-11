@@ -76,7 +76,7 @@ public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter>
                         setEmpty(true, volleyError.networkResponse == null ?
                                 DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
                         if (getView() != null)
-                            Snackbar.make(getView(), getText(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), getText(R.string.workitem_list_refresh_error), Snackbar.LENGTH_SHORT).show();
                     }
                 });
         projectsRequest.setTag(TAG);
