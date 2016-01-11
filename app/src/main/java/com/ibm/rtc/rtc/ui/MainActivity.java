@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity
     private ProjectsListFragment mProjectsListFragment;
     private Fragment mLastUsedFragment;
     private Project mCurrentProject;
+    private List<Account> mAccountList;
+    private Account mSelectedAccount;
 
     public static void startActivity(Activity context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -63,9 +65,9 @@ public class MainActivity extends AppCompatActivity
 
         //在创建的时候判断是否已经有登录的账号，如果没有就启动LoginActivity
         AccountManager accountManager = AccountManager.getInstance(this);
-        List<Account> accounts = accountManager.getAccounts();
+        mAccountList = accountManager.getAccounts();
 
-        if (accounts == null || accounts.isEmpty()) {
+        if (mAccountList == null || mAccountList.isEmpty()) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
@@ -133,6 +135,14 @@ public class MainActivity extends AppCompatActivity
                         .withIcon(Octicons.Icon.oct_settings)
                         .withIdentifier(R.id.drawer_settings));
 
+        drawerBuilder.addDrawerItems(new SecondaryDrawerItem().withName(R.string.drawer_menu_about)
+                        .withIcon(Octicons.Icon.oct_info)
+                        .withIdentifier(R.id.drawer_about)
+                        .withSelectable(false), new SecondaryDrawerItem().withName(R.string.drawer_menu_sign_out)
+                        .withIcon(Octicons.Icon.oct_sign_out)
+                        .withIdentifier(R.id.drawer_sign_out)
+                        .withSelectable(false));
+
         drawerBuilder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -147,6 +157,12 @@ public class MainActivity extends AppCompatActivity
                             break;
                         case R.id.drawer_settings:
                             onSettingsSelected();
+                            break;
+                        case R.id.drawer_about:
+                            onAboutSelected();
+                            break;
+                        case R.id.drawer_sign_out:
+                            onSignOutSelected();
                             break;
                     }
                 }
@@ -165,7 +181,25 @@ public class MainActivity extends AppCompatActivity
                 .withHeaderBackground(R.color.cardview_dark_background)
                 .withOnAccountHeaderListener(this);
 
-        ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem().withName("Jack")
+        boolean usedSelected = false;
+        for (Account account : mAccountList) {
+            ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem().withName(account.getUsername())
+                    .withIdentifier(account.hashCode())
+                    //TODO 头像设置
+                    .withIcon(R.mipmap.ic_launcher);
+            //默认选中第一个
+            if (!usedSelected) {
+                usedSelected = true;
+                profileDrawerItem.withSetSelected(true);
+                mSelectedAccount = account;
+            } else {
+                profileDrawerItem.withSetSelected(false);
+            }
+            headerBuilder.addProfiles(profileDrawerItem);
+        }
+
+
+        /*ProfileDrawerItem profileDrawerItem = new ProfileDrawerItem().withName("Jack")
                 .withEmail("Jackwangcs@outlook.com")
                 .withIcon(R.mipmap.ic_launcher)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -177,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-        headerBuilder.addProfiles(profileDrawerItem);
+        headerBuilder.addProfiles(profileDrawerItem);*/
         return headerBuilder.build();
     }
 
@@ -190,7 +224,7 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    public boolean onWorkitemsSelected() {
+    private boolean onWorkitemsSelected() {
         if (mCurrentProject == null) {
             Snackbar.make(this.mContentView,
                     getString(R.string.please_select_project), Snackbar.LENGTH_SHORT).show();
@@ -207,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public boolean onProjectsSelected() {
+    private boolean onProjectsSelected() {
         //Snackbar.make(mContentView, "Projects clicked", Snackbar.LENGTH_SHORT).show();
         if (mProjectsListFragment == null) {
             mProjectsListFragment = new ProjectsListFragment();
@@ -216,6 +250,31 @@ public class MainActivity extends AppCompatActivity
         clearFragments();
         setFragment(mProjectsListFragment, false);
         setTitle(R.string.project_list_title);
+        return true;
+    }
+
+
+    private boolean onAboutSelected() {
+        return false;
+    }
+
+    private boolean onSignOutSelected() {
+        AccountManager accountManager = AccountManager.getInstance(this);
+        try {
+            accountManager.removeAccount(mSelectedAccount.getUsername());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SharedPreferences.Editor editor =
+                PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.remove(CURRENT_PROJECT);
+        editor.apply();
+
+        Intent intent = new Intent();
+        intent.setClass(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+
         return true;
     }
 
@@ -267,7 +326,6 @@ public class MainActivity extends AppCompatActivity
     public void onProjectSwitch(Project project) {
         if (mCurrentProject == null || !mCurrentProject.getUuid().equals(project.getUuid())) {
             mCurrentProject = project;
-            mDrawer.setSelection(R.id.drawer_workitems);
             Gson gson = new Gson();
             String jsonText = gson.toJson(mCurrentProject);
             SharedPreferences.Editor editor =
@@ -275,5 +333,6 @@ public class MainActivity extends AppCompatActivity
             editor.putString(CURRENT_PROJECT, jsonText);
             editor.apply();
         }
+        mDrawer.setSelection(R.id.drawer_workitems);
     }
 }

@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,12 +38,13 @@ public class AccountManager {
         return mInstance;
     }
 
-    public @Nullable List<Account> getAccounts() {
-        List<Account> accountList = null;
+    public @Nullable ArrayList<Account> getAccounts() {
+        ArrayList<Account> accountList = null;
         String jsonText = mSharedPreferences.getString(ACCOUNT_LIST_TAG, null);
         if (jsonText != null) {
             Gson gson = new Gson();
-            accountList = Arrays.asList(gson.fromJson(jsonText, Account[].class));
+            accountList = new ArrayList<>();
+            accountList.addAll(Arrays.asList(gson.fromJson(jsonText, Account[].class)));
         }
         return accountList;
     }
@@ -56,15 +58,22 @@ public class AccountManager {
         saveAccountList(accountList);
     }
 
-    public void removeAccount(Account account) throws Exception{
+    public void removeAccount(String username) throws Exception {
         List<Account> accountList = getAccounts();
+        if (accountList == null || accountList.isEmpty()) {
+            throw new Exception("Account dose not exist!");
+        }
 
-        if (accountList != null && accountList.contains(account))
-            accountList.remove(account);
-        else
-            throw new Exception("Account Not exist!");
+        ArrayList<Account> accounts = new ArrayList<>(accountList);
+        Iterator<Account> iterator = accounts.iterator();
+        while (iterator.hasNext()) {
+            Account account = iterator.next();
+            if (account.getUsername().equals(username)) {
+                iterator.remove();
+            }
+        }
 
-        saveAccountList(accountList);
+        saveAccountList(accounts);
     }
 
 

@@ -39,8 +39,8 @@ public class UrlManager {
 
     public String getRootUrl() {
         if (mHost == null) {
-            //mHost = getPrefs().getString(HOST, "opentechtest.chinacloudapp.cn");
-            mHost = getPrefs().getString(HOST, "10.205.18.171");
+            mHost = getPrefs().getString(HOST, "opentechtest.chinacloudapp.cn");
+            //mHost = getPrefs().getString(HOST, "10.205.18.171");
             mPort = getPrefs().getInt(PORT, 4567);
             if (mHost != null) {
                 return mProtocol + mHost + ":" + mPort + "/";
