@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +13,6 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ibm.rtc.rtc.R;
-import com.ibm.rtc.rtc.adapter.AttributeItem;
-import com.ibm.rtc.rtc.adapter.WorkitemAttributeAdapter;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.WorkitemRequest;
 import com.ibm.rtc.rtc.model.Workitem;
@@ -34,8 +29,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
 
     private TextView description;
     private SwipeRefreshLayout swipe;
-    private RecyclerView recyclerView;
-    private WorkitemAttributeAdapter adapter;
+    private View attributes;
 
     public static WorkitemDetailFragment newInstance(Workitem workitem) {
         Bundle bundle = new Bundle();
@@ -57,23 +51,14 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        description = (TextView) view.findViewById(R.id.description);
         swipe = (SwipeRefreshLayout) view.findViewById(R.id.swipe);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
-
-        if (recyclerView != null) {
-            final org.solovyev.android.views.llm.LinearLayoutManager linearLayoutManager =
-                    new org.solovyev.android.views.llm.LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-            //linearLayoutManager.setChildSize(56);
-            /*final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());*/
-            recyclerView.setLayoutManager(linearLayoutManager);
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-        }
-
         if (swipe != null) {
             swipe.setOnRefreshListener(this);
             swipe.setColorSchemeColors(getActivity().getResources().getColor(R.color.primary_light));
         }
+
+        description = (TextView) view.findViewById(R.id.description);
+        attributes = view.findViewById(R.id.attributes);
 
         setDisplayContent();
     }
@@ -105,15 +90,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     }
 
     private void setUpAttributeList() {
-        adapter = new WorkitemAttributeAdapter(LayoutInflater.from(getActivity()));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
-        adapter.add(new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getCreatedTime().toString(), null));
 
-        recyclerView.setAdapter(adapter);
     }
 
 
