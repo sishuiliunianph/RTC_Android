@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ibm.rtc.rtc.R;
+import com.ibm.rtc.rtc.adapter.AttributeItem;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.WorkitemRequest;
 import com.ibm.rtc.rtc.model.Workitem;
@@ -29,7 +30,8 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
 
     private TextView description;
     private SwipeRefreshLayout swipe;
-    private View attributes;
+    private ViewGroup attributes;
+    private int count = 0;
 
     public static WorkitemDetailFragment newInstance(Workitem workitem) {
         Bundle bundle = new Bundle();
@@ -58,7 +60,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         }
 
         description = (TextView) view.findViewById(R.id.description);
-        attributes = view.findViewById(R.id.attributes);
+        attributes = (ViewGroup) view.findViewById(R.id.attributes);
 
         setDisplayContent();
     }
@@ -81,7 +83,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 if (getView() != null)
-                    Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT);
+                    Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
                 stopRefresh();
             }
         });
@@ -90,7 +92,27 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     }
 
     private void setUpAttributeList() {
-
+        attributes.removeAllViews();
+        if (count > 0)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 1)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 2)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 3)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Snackbar.make(getView(), "sdfsd", Snackbar.LENGTH_SHORT).show();
+                    }
+                }).getView(getActivity(), attributes));
+        count++;
     }
 
 
