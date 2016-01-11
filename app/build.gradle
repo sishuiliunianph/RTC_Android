@@ -41,5 +41,6 @@ dependencies {
     compile 'com.github.xiprox.errorview:library:2.2.0'
     compile 'com.mikepenz:octicons-typeface:3.0.1@aar'
     compile 'com.mikepenz:google-material-typeface:1.2.0@aar'
+    compile 'org.solovyev.android.views:linear-layout-manager:0.5@aar'
     compile files('libs/volley.jar')
 }

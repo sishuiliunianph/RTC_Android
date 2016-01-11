@@ -2,13 +2,20 @@ package com.ibm.rtc.rtc.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.ibm.rtc.rtc.R;
+import com.ibm.rtc.rtc.adapter.AttributeItem;
+import com.ibm.rtc.rtc.core.UrlManager;
+import com.ibm.rtc.rtc.core.WorkitemRequest;
 import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.TitleProvider;
 import com.ibm.rtc.rtc.ui.base.WorkitembaseFragment;
@@ -18,15 +25,13 @@ import com.mikepenz.octicons_typeface_library.Octicons;
 /**
  * Created by v-wajie on 1/6/2016.
  */
-public class WorkitemDetailFragment extends WorkitembaseFragment implements TitleProvider {
+public class WorkitemDetailFragment extends WorkitembaseFragment implements TitleProvider, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "WorkitemDetailFragment";
 
-    private TextView summary;
     private TextView description;
-    private TextView type;
-    private TextView id;
-    private TextView priority;
-    private TextView severity;
+    private SwipeRefreshLayout swipe;
+    private ViewGroup attributes;
+    private int count = 0;
 
     public static WorkitemDetailFragment newInstance(Workitem workitem) {
         Bundle bundle = new Bundle();
@@ -35,6 +40,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         detailFragment.setArguments(bundle);
         return detailFragment;
     }
+
 
     @Nullable
     @Override
@@ -47,23 +53,72 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        summary = (TextView) view.findViewById(R.id.summary);
+        swipe = (SwipeRefreshLayout) view.findViewById(R.id.swipe);
+        if (swipe != null) {
+            swipe.setOnRefreshListener(this);
+            swipe.setColorSchemeColors(getActivity().getResources().getColor(R.color.primary_light));
+        }
+
         description = (TextView) view.findViewById(R.id.description);
-        type = (TextView) view.findViewById(R.id.type);
-        id = (TextView) view.findViewById(R.id.workitem_id);
-        priority = (TextView) view.findViewById(R.id.priority);
-        severity = (TextView) view.findViewById(R.id.severity);
+        attributes = (ViewGroup) view.findViewById(R.id.attributes);
 
         setDisplayContent();
     }
 
+    private void executeRequest() {
+        UrlManager urlManager = new UrlManager(getActivity());
+        String workitemUrl = urlManager.getWorkitemUrl(getWorkitem().getId());
+        WorkitemRequest workitemRequest = new WorkitemRequest(workitemUrl, new Response.Listener<Workitem>() {
+            @Override
+            public void onResponse(Workitem workitem) {
+                if (workitem != null) {
+                    setDisplayContent();
+                } else {
+                    if (getView() != null)
+                        Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT);
+                }
+                stopRefresh();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                if (getView() != null)
+                    Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
+                stopRefresh();
+            }
+        });
+        workitemRequest.setTag(TAG);
+        addToRequestQueue(workitemRequest);
+    }
+
+    private void setUpAttributeList() {
+        attributes.removeAllViews();
+        if (count > 0)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 1)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 2)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        if (count > 3)
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
+        attributes.addView(
+                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Snackbar.make(getView(), "sdfsd", Snackbar.LENGTH_SHORT).show();
+                    }
+                }).getView(getActivity(), attributes));
+        count++;
+    }
+
+
     private void setDisplayContent() {
-        summary.setText(getWorkitem().getTitle());
         description.setText(Html.fromHtml(getWorkitemDescription()));
-        type.setText(getWorkitem().getType());
-        id.setText(String.valueOf(getWorkitem().getId()));
-        priority.setText(getWorkitem().getPriority());
-        priority.setText(getWorkitem().getSeverity());
+        setUpAttributeList();
     }
 
     private String getWorkitemDescription() {
@@ -83,5 +138,21 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     @Override
     public IIcon getTitleIcon() {
         return Octicons.Icon.oct_info;
+    }
+
+    @Override
+    public void onRefresh() {
+        executeRequest();
+    }
+
+    private void stopRefresh() {
+        if (swipe != null) {
+            swipe.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipe.setRefreshing(false);
+                }
+            });
+        }
     }
 }

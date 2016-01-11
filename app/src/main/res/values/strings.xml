@@ -34,7 +34,7 @@
 
     <!-- Workitem list fragment -->
     <string name="workitem_title">Workitem Title</string>
-    <string name="workitem_refresh_error">Refresh Workitem List failed</string>
+    <string name="workitem_list_refresh_error">Refresh Workitem List failed.</string>
     <string name="no_workitems">No workitems</string>
     <string name="workitem_list_title">Workitems For </string>
     <string name="workitem_filter">Workitem Filter</string>
@@ -57,6 +57,7 @@
     <string name="workitem_id">ID: </string>
     <string name="workitem_priority">Priority: </string>
     <string name="workitem_severity">Severity: </string>
+    <string name="workitem_refresh_error">Refresh Workitem failed.</string>
 
     <!-- Workitem comments fragment -->
     <string name="workitem_comment_title">Comments</string>

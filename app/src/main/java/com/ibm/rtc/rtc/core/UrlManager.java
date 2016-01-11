@@ -52,6 +52,10 @@ public class UrlManager {
         return mProtocol + mHost + ":" + mPort + "/";
     }
 
+    public String getWorkitemUrl(int id) {
+        return getRootUrl() + "workitems?id=" + id;
+    }
+
     public String getLoginUrl() {
         return getRootUrl() + LOGIN_PATH;
     }
