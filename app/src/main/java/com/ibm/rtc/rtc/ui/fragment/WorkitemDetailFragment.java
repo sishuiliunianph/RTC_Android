@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ibm.rtc.rtc.R;
+import com.ibm.rtc.rtc.adapter.AttributeItemViewListBuilder;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.WorkitemRequest;
 import com.ibm.rtc.rtc.model.Workitem;
@@ -75,8 +76,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
                     workitem = item;
                     setDisplayContent();
                 } else {
-                    if (getView() != null)
-                        Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT);
+                    throw new IllegalStateException("This can not happen.");
                 }
                 stopRefresh();
             }
@@ -111,7 +111,62 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     private void setUpAttributeList() {
         attributes.removeAllViews();
 
+        AttributeItemViewListBuilder builder = new AttributeItemViewListBuilder(
+                getActivity(), workitem, attributes);
+        builder.addType(null)
+                .addFiledAgainst(null)
+                .addOwnedBy(null);
+        switch (workitem.getTypeIndentifier()) {
+            case Defect:
+                builder.addCreatedBy(null)
+                        .addCreatedTime(null)
+                        .addPriority(null)
+                        .addSeverity(null)
+                        .addPlannedFor(null)
+                        .addEstimateTime(null)
+                        .addTimeSpent(null)
+                        .addDueDate(null);
+                break;
+            case Task:
+                builder.addPriority(null)
+                        .addPlannedFor(null)
+                        .addEstimateTime(null)
+                        .addTimeSpent(null)
+                        .addDueDate(null);
+                break;
+            case Story:
+                builder.addPriority(null)
+                        .addPlannedFor(null)
+                        .addBusinessValue(null)
+                        .addRisk(null)
+                        .addStoryPoint(null);
+                break;
+            case Epic:
+                builder.addPriority(null)
+                        .addPlannedFor(null)
+                        .addEstimateTime(null)
+                        .addTimeSpent(null)
+                        .addDueDate(null);
+                break;
+            case BuildTracking:
+                builder.addCreatedBy(null);
+                break;
+            case Impediment:
+                break;
+            case Adoption:
+                builder.addPlannedFor(null)
+                        .addDueDate(null)
+                        .addImpact(null);
+                break;
+            case Retrospective:
+                builder.addPlannedFor(null);
+                break;
+        }
 
+
+        for (View view : builder.build()) {
+            attributes.addView(view);
+        }
     }
 
 

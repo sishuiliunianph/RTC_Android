@@ -1,8 +1,5 @@
 package com.ibm.rtc.rtc.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +13,7 @@ import java.util.List;
 /**
  * Created by Jack on 2015/12/17.
  */
-public class Workitem implements Parcelable {
+public class Workitem /* implements Parcelable*/ {
 
     public static final String TAG = "Workitem";
     private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -25,6 +22,7 @@ public class Workitem implements Parcelable {
     private int id;
     private String description;
     private String type;
+    private WorkitemType typeIndentifier;
     private String filedAgainst;
     private String ownedBy;
     private String createdBy;
@@ -70,6 +68,8 @@ public class Workitem implements Parcelable {
         workitem.setOwnedBy(object.getJSONObject("ownedBy").getString("name"));
         workitem.setFiledAgainst(object.getJSONObject("filedAgainst").getString("title"));
         workitem.setType(object.getJSONObject("type").getString("title"));
+        workitem.setTypeIndentifier(WorkitemType.getType(
+                object.getJSONObject("type").getString("identifier")));
         workitem.setFoundIn(object.getJSONObject("foundIn").getString("title"));
         workitem.setBusinessValue(object.getJSONObject("businessValue").getString("title"));
         workitem.setRisk(object.getJSONObject("risk").getString("title"));
@@ -128,6 +128,14 @@ public class Workitem implements Parcelable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public WorkitemType getTypeIndentifier() {
+        return typeIndentifier;
+    }
+
+    public void setTypeIndentifier(WorkitemType typeIndentifier) {
+        this.typeIndentifier = typeIndentifier;
     }
 
     public String getFiledAgainst() {
@@ -290,7 +298,7 @@ public class Workitem implements Parcelable {
         this.impact = impact;
     }
 
-    @Override
+ /*   @Override
     public int describeContents() {
         return 0;
     }
@@ -348,6 +356,6 @@ public class Workitem implements Parcelable {
         commentsUrl = in.readString();
         subscribersUrl = in.readString();
         plannedFor = in.readString();
-    }
+    }*/
 
 }

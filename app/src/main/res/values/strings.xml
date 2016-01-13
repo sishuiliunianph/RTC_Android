@@ -59,6 +59,20 @@
     <string name="workitem_severity">Severity: </string>
     <string name="workitem_refresh_error">Refresh Workitem failed.</string>
     <string name="button_retry">Retry</string>
+    <string name="workitem_ownedBy">Owned By: </string>
+    <string name="workitem_createdBy">Created By: </string>
+    <string name="workitem_createdTime">Created Time: </string>
+    <string name="workitem_plannedFor">Planed For: </string>
+    <string name="workitem_foundIn">Found In: </string>
+    <string name="workitem_estimate">Estimate Time: </string>
+    <string name="workitem_timeSpent">Time Spent: </string>
+    <string name="workitem_dueDate">Due Date: </string>
+    <string name="workitem_businessValue">Business Value: </string>
+    <string name="workitem_risk">Risk: </string>
+    <string name="workitem_impact">Impact: </string>
+    <string name="workitem_storyPoint">Story Point: </string>
+    <string name="workitem_fileAgainst">File Against: </string>
+    <string name="workitem_modifiedTime">Last Modified Time:</string>
 
     <!-- Workitem comments fragment -->
     <string name="workitem_comment_title">Comments</string>
