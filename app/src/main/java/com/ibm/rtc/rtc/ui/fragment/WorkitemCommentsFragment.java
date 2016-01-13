@@ -3,7 +3,6 @@ package com.ibm.rtc.rtc.ui.fragment;
 import android.os.Bundle;
 
 import com.ibm.rtc.rtc.R;
-import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.TitleProvider;
 import com.ibm.rtc.rtc.ui.base.WorkitembaseFragment;
 import com.mikepenz.iconics.typeface.IIcon;
@@ -15,9 +14,9 @@ import com.mikepenz.octicons_typeface_library.Octicons;
 public class WorkitemCommentsFragment extends WorkitembaseFragment implements TitleProvider {
 
 
-    public static WorkitemCommentsFragment newInstance(Workitem workitem) {
+    public static WorkitemCommentsFragment newInstance(int id) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(WORKITEM_INFO, workitem);
+        bundle.putInt(WORKITEM_ID, id);
 
         WorkitemCommentsFragment commentsFragment = new WorkitemCommentsFragment();
         commentsFragment.setArguments(bundle);

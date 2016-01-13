@@ -7,31 +7,26 @@ import android.support.v4.app.Fragment;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.ibm.rtc.rtc.core.VolleyQueue;
-import com.ibm.rtc.rtc.model.Workitem;
 
 /**
  * Created by v-wajie on 1/6/2016.
  */
 public abstract class WorkitembaseFragment extends Fragment {
 
-    protected static final String WORKITEM_INFO = "WORKITEM_INFO";
-    private Workitem mWorkitem;
+    protected static final String WORKITEM_ID = "WORKITEM_ID";
+    private int mWorkitemId;
     private RequestQueue mRequestQueue;
 
     private void loadArguments() {
         if (getArguments() != null) {
-            mWorkitem = getArguments().getParcelable(WORKITEM_INFO);
+            mWorkitemId = getArguments().getInt(WORKITEM_ID);
         } else {
             throw new IllegalStateException("The Workitem must not be null");
         }
     }
 
-    protected Workitem getWorkitem() {
-        return mWorkitem;
-    }
-
-    protected void setWorkitem(Workitem workitem) {
-        mWorkitem = workitem;
+    protected int getWorkitemId() {
+        return mWorkitemId;
     }
 
     @Override

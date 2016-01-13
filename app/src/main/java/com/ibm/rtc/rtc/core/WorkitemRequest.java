@@ -7,8 +7,8 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.ibm.rtc.rtc.model.Workitem;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
@@ -28,7 +28,7 @@ public class WorkitemRequest extends JsonRequest<Workitem> {
         try {
             String json = new String(networkResponse.data,
                     HttpHeaderParser.parseCharset(networkResponse.headers, "utf-8"));
-            Workitem workitem = Workitem.fromJSON(new JSONObject(json));
+            Workitem workitem = Workitem.fromJSON(new JSONArray(json).getJSONObject(0));
             return Response.success(workitem, HttpHeaderParser.parseCacheHeaders(networkResponse));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));

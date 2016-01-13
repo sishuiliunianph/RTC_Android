@@ -37,6 +37,13 @@ public class Workitem implements Parcelable {
     private String commentsUrl;
     private String subscribersUrl;
     private String plannedFor;
+    private String foundIn;
+    private long estimate;
+    private long timeSpent;
+    private String businessValue;
+    private String risk;
+    private String impact;
+    private String storyPoint;
 
     public Workitem() {}
 
@@ -63,6 +70,22 @@ public class Workitem implements Parcelable {
         workitem.setOwnedBy(object.getJSONObject("ownedBy").getString("name"));
         workitem.setFiledAgainst(object.getJSONObject("filedAgainst").getString("title"));
         workitem.setType(object.getJSONObject("type").getString("title"));
+        workitem.setFoundIn(object.getJSONObject("foundIn").getString("title"));
+        workitem.setBusinessValue(object.getJSONObject("businessValue").getString("title"));
+        workitem.setRisk(object.getJSONObject("risk").getString("title"));
+        workitem.setStoryPoint(object.getJSONObject("storyPoint").getString("title"));
+
+        if (!object.getString("estimate").equals("null")) {
+            workitem.setEstimate(Long.parseLong(object.getString("estimate")));
+        } else {
+            workitem.setEstimate(-1);
+        }
+
+        if (!object.getString("timeSpent").equals("null")) {
+            workitem.setTimeSpent(Long.parseLong(object.getString("timeSpent")));
+        } else {
+            workitem.setTimeSpent(-1);
+        }
 
         if (!object.getString("dueDate").equals("null")) {
             workitem.setDueDate(dateFormat.parse(object.getString("dueDate")));
@@ -209,6 +232,62 @@ public class Workitem implements Parcelable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFoundIn() {
+        return foundIn;
+    }
+
+    public void setFoundIn(String foundIn) {
+        this.foundIn = foundIn;
+    }
+
+    public long getEstimate() {
+        return estimate;
+    }
+
+    public void setEstimate(long estimate) {
+        this.estimate = estimate;
+    }
+
+    public long getTimeSpent() {
+        return timeSpent;
+    }
+
+    public void setTimeSpent(long timeSpent) {
+        this.timeSpent = timeSpent;
+    }
+
+    public String getBusinessValue() {
+        return businessValue;
+    }
+
+    public void setBusinessValue(String businessValue) {
+        this.businessValue = businessValue;
+    }
+
+    public String getRisk() {
+        return risk;
+    }
+
+    public void setRisk(String risk) {
+        this.risk = risk;
+    }
+
+    public String getStoryPoint() {
+        return storyPoint;
+    }
+
+    public void setStoryPoint(String storyPoint) {
+        this.storyPoint = storyPoint;
+    }
+
+    public String getImpact() {
+        return impact;
+    }
+
+    public void setImpact(String impact) {
+        this.impact = impact;
     }
 
     @Override

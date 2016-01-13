@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private View mLoginFormView;
     private boolean isLogining =false;
     private RequestQueue mRequestQueue;
+    private UrlManager mUrlManager;
 
 
     @Override
@@ -56,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mRequestQueue = VolleyQueue.getInstance(this).getRequestQueue();
+        mUrlManager = UrlManager.getInstance(this);
 
         // Set up the login form.
         mHostView = (EditText) findViewById(R.id.host);
@@ -152,10 +154,9 @@ public class LoginActivity extends AppCompatActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            UrlManager urlManager = new UrlManager(this);
-            urlManager.setHost(host);
-            urlManager.setPort(port);
-            String loginUrl = urlManager.getLoginUrl();
+            mUrlManager.setHost(host);
+            mUrlManager.setPort(port);
+            String loginUrl = mUrlManager.getLoginUrl();
 
             final String AUTHENTICATE_ATTR = "authenticated";
             JSONObject body = new JSONObject();
@@ -254,8 +255,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mHostView.setText(getText(R.string.default_host));
-        mPortView.setText(getText(R.string.default_port));
+        mHostView.setText(mUrlManager.getmHost());
+        mPortView.setText(String.valueOf(mUrlManager.getmPort()));
     }
 
     @Override

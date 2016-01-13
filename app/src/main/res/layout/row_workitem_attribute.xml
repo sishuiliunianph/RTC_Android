@@ -13,9 +13,10 @@
 
     <TextView
         android:id="@+id/attribute"
+        android:textSize="@dimen/material_drawer_item_profile_text"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:gravity="center_vertical"
-        android:paddingLeft="16dp" />
+        android:paddingLeft="8dp" />
 
 </LinearLayout>

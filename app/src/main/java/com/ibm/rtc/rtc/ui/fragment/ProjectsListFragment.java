@@ -50,7 +50,7 @@ public class ProjectsListFragment extends LoadingListFragment<ProjectAdapter>
     protected void executeRequest() {
         super.executeRequest();
 
-        UrlManager urlManager = new UrlManager(getActivity());
+        UrlManager urlManager = UrlManager.getInstance(getActivity());
         String projectUrl = urlManager.getRootUrl() + "projects";
         ProjectsRequest projectsRequest = new ProjectsRequest(projectUrl,
                 new Response.Listener<List<Project>>() {

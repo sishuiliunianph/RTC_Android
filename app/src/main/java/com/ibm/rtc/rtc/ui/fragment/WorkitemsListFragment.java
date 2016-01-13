@@ -225,7 +225,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
     protected void executeRequest() {
         super.executeRequest();
 
-        UrlManager urlManager = new UrlManager(getActivity());
+        UrlManager urlManager = UrlManager.getInstance(getActivity());
         String workitemsUrl = urlManager.getRootUrl() + "workitems?uuid=" + mProject.getUuid();
         WorkitemsRequest workitemsRequest = new WorkitemsRequest(workitemsUrl,
             new Response.Listener<List<Workitem>>() {

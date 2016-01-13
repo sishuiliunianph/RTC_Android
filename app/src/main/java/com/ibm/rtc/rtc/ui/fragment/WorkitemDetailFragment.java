@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ibm.rtc.rtc.R;
-import com.ibm.rtc.rtc.adapter.AttributeItem;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.WorkitemRequest;
 import com.ibm.rtc.rtc.model.Workitem;
@@ -31,11 +30,12 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     private TextView description;
     private SwipeRefreshLayout swipe;
     private ViewGroup attributes;
-    private int count = 0;
+    private Workitem workitem;
+    private int count = 5;
 
-    public static WorkitemDetailFragment newInstance(Workitem workitem) {
+    public static WorkitemDetailFragment newInstance(int id) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(WORKITEM_INFO, workitem);
+        bundle.putInt(WORKITEM_ID, id);
         WorkitemDetailFragment detailFragment = new WorkitemDetailFragment();
         detailFragment.setArguments(bundle);
         return detailFragment;
@@ -62,16 +62,17 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         description = (TextView) view.findViewById(R.id.description);
         attributes = (ViewGroup) view.findViewById(R.id.attributes);
 
-        setDisplayContent();
+        executeRequest();
     }
 
     private void executeRequest() {
-        UrlManager urlManager = new UrlManager(getActivity());
-        String workitemUrl = urlManager.getWorkitemUrl(getWorkitem().getId());
+        UrlManager urlManager = UrlManager.getInstance(getActivity());
+        final String workitemUrl = urlManager.getWorkitemUrl(getWorkitemId());
         WorkitemRequest workitemRequest = new WorkitemRequest(workitemUrl, new Response.Listener<Workitem>() {
             @Override
-            public void onResponse(Workitem workitem) {
-                if (workitem != null) {
+            public void onResponse(Workitem item) {
+                if (item != null) {
+                    workitem = item;
                     setDisplayContent();
                 } else {
                     if (getView() != null)
@@ -83,7 +84,16 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 if (getView() != null)
-                    Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), getString(R.string.workitem_refresh_error), Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.button_retry, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    executeRequest();
+                                }
+                            }).show();
+                if (workitem == null) {
+                    displayError(volleyError.getCause().getMessage());
+                }
                 stopRefresh();
             }
         });
@@ -91,28 +101,17 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
         addToRequestQueue(workitemRequest);
     }
 
+    private void displayError(String errorMsg) {
+        description.setText(Html.fromHtml(
+                "<h2> Error <h2>" +
+                "<p>" + errorMsg + "</p>"
+        ));
+    }
+
     private void setUpAttributeList() {
         attributes.removeAllViews();
-        if (count > 0)
-        attributes.addView(
-                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
-        if (count > 1)
-        attributes.addView(
-                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
-        if (count > 2)
-        attributes.addView(
-                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
-        if (count > 3)
-        attributes.addView(
-                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), null).getView(getActivity(), attributes));
-        attributes.addView(
-                new AttributeItem(Octicons.Icon.oct_alert, getWorkitem().getOwnedBy(), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Snackbar.make(getView(), "sdfsd", Snackbar.LENGTH_SHORT).show();
-                    }
-                }).getView(getActivity(), attributes));
-        count++;
+
+
     }
 
 
@@ -122,7 +121,7 @@ public class WorkitemDetailFragment extends WorkitembaseFragment implements Titl
     }
 
     private String getWorkitemDescription() {
-        String description = getWorkitem().getDescription();
+        String description = workitem.getDescription();
         if (description == null || description.isEmpty()) {
             description = getString(R.string.blank_description);
         }

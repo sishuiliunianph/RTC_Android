@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.ibm.rtc.rtc.R;
+import com.ibm.rtc.rtc.model.Project;
 import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.TitleProvider;
 import com.ibm.rtc.rtc.ui.fragment.WorkitemCommentsFragment;
@@ -30,17 +31,20 @@ import java.util.List;
  */
 public class WorkitemActivity extends AppCompatActivity {
     private static final String TAG = "WorkitemActivity";
-    public static final String WORKITME_INFO = "WORKITME_INFO";
+    public static final String WORKITME_ID = "WORKITME_ID";
+    public static final String WORKITEM_TITLE = "WORKITEM_TITLE";
 
     private Toolbar mToolbar;
     private ArrayList<Fragment> mFragments;
     private ViewPager mViewPager;
 
-    private Workitem mWorkitem;
+    private Integer mWorkitemId;
+    private String mWorkitemTitle;
 
-    public static Intent createLauncherIntent(Context context, Workitem workitem) {
+    public static Intent createLauncherIntent(Context context, int workitemId, String workitemTitle) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(WORKITME_INFO, workitem);
+        bundle.putInt(WORKITME_ID, workitemId);
+        bundle.putString(WORKITEM_TITLE, workitemTitle);
 
         Intent intent = new Intent(context, WorkitemActivity.class);
         intent.putExtras(bundle);
@@ -66,26 +70,28 @@ public class WorkitemActivity extends AppCompatActivity {
 
         //从Intent中获取将要展示的Workitem.
         if (getIntent().getExtras() != null) {
-            mWorkitem = getIntent().getExtras().getParcelable(WORKITME_INFO);
-            if (mWorkitem != null) {
-                //设置标题
-                mToolbar.setTitle(mWorkitem.getTitle());
-
-                //获取ViewPager
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-                mViewPager = (ViewPager) findViewById(R.id.content);
-
-                //添加fragment
-                addFragments();
-
-                NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(), mFragments);
-                mViewPager.setAdapter(adapter);
-                tabLayout.setupWithViewPager(mViewPager);
-
-                showTabsIcons(tabLayout);
-            } else {
+            try {
+                mWorkitemId = getIntent().getExtras().getInt(WORKITME_ID);
+                mWorkitemTitle = getIntent().getExtras().getString(WORKITEM_TITLE);
+            } catch (Exception e) {
                 finish();
             }
+
+            //设置标题
+            mToolbar.setTitle(mWorkitemTitle);
+
+            //获取ViewPager
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+            mViewPager = (ViewPager) findViewById(R.id.content);
+
+            //添加fragment
+            addFragments();
+
+            NavigationAdapter adapter = new NavigationAdapter(getSupportFragmentManager(), mFragments);
+            mViewPager.setAdapter(adapter);
+            tabLayout.setupWithViewPager(mViewPager);
+
+            showTabsIcons(tabLayout);
         } else {
             finish();
         }
@@ -93,8 +99,8 @@ public class WorkitemActivity extends AppCompatActivity {
 
     private void addFragments() {
         mFragments = new ArrayList<>();
-        mFragments.add(WorkitemDetailFragment.newInstance(mWorkitem));
-        mFragments.add(WorkitemCommentsFragment.newInstance(mWorkitem));
+        mFragments.add(WorkitemDetailFragment.newInstance(mWorkitemId));
+        mFragments.add(WorkitemCommentsFragment.newInstance(mWorkitemId));
     }
 
     private void showTabsIcons(TabLayout tabLayout) {
