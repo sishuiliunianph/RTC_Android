@@ -2,6 +2,7 @@ package com.ibm.rtc.rtc.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
