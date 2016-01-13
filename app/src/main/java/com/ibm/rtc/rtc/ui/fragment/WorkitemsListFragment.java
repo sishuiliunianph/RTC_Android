@@ -225,7 +225,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
     protected void executeRequest() {
         super.executeRequest();
 
-        UrlManager urlManager = new UrlManager(getActivity());
+        UrlManager urlManager = UrlManager.getInstance(getActivity());
         String workitemsUrl = urlManager.getRootUrl() + "workitems?uuid=" + mProject.getUuid();
         WorkitemsRequest workitemsRequest = new WorkitemsRequest(workitemsUrl,
             new Response.Listener<List<Workitem>>() {
@@ -253,7 +253,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                         DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
 
                     if (getView() != null)
-                        Snackbar.make(getView(), getText(R.string.workitem_refresh_error), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(getView(), getText(R.string.workitem_list_refresh_error), Snackbar.LENGTH_SHORT).show();
                 }
             });
         workitemsRequest.setTag(TAG);

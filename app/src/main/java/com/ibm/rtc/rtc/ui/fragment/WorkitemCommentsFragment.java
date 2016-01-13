@@ -25,6 +25,7 @@ import com.ibm.rtc.rtc.model.Comment;
 import com.ibm.rtc.rtc.model.Project;
 import com.ibm.rtc.rtc.model.Workitem;
 import com.ibm.rtc.rtc.ui.base.TitleProvider;
+import com.ibm.rtc.rtc.ui.base.WorkitembaseFragment;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.octicons_typeface_library.Octicons;
 import com.ibm.rtc.rtc.ui.base.LoadingListFragment;
@@ -38,7 +39,7 @@ import java.util.List;
  */
 public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter> implements TitleProvider {
     private static final String TAG = "CommentsFragment";
-    private static final String COMMENT_INFO = "COMMENT_INFO";
+    private static final String WORKITEM_ID = "WORKITEM_ID";
 
     private RequestQueue mRequestQueue;
     private final int DEFAULT_STATUS_CODE = 500;
@@ -114,7 +115,7 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
     protected void executeRequest() {
         super.executeRequest();
         // TODO: 2016/1/12 add get comment
-        UrlManager urlManager = new UrlManager(getActivity());
+        UrlManager urlManager = UrlManager.getInstance(getActivity());
         String projectUrl = urlManager.getRootUrl() + "projects";
         ProjectsRequest projectsRequest = new ProjectsRequest(projectUrl,
                 new Response.Listener<List<Project>>() {
@@ -157,10 +158,9 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
         super.onStop();
         mRequestQueue.cancelAll(TAG);
     }
-
-    public static WorkitemCommentsFragment newInstance(Workitem workitem) {
+    public static WorkitemCommentsFragment newInstance(int id) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(COMMENT_INFO, workitem);
+        bundle.putInt(WORKITEM_ID, id);
 
         WorkitemCommentsFragment commentsFragment = new WorkitemCommentsFragment();
         commentsFragment.setArguments(bundle);

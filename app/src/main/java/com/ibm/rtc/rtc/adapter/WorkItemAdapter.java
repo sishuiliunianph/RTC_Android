@@ -63,7 +63,8 @@ public class WorkitemAdapter extends RecyclerArrayAdapter<Workitem, WorkitemAdap
                     Workitem workitem = getItem(getAdapterPosition());
                     if (workitem != null) {
                         v.getContext().startActivity(
-                                WorkitemActivity.createLauncherIntent(v.getContext(), workitem));
+                                WorkitemActivity.createLauncherIntent(v.getContext(), workitem.getId(),
+                                        workitem.getTitle()));
                     }
                 }
             });

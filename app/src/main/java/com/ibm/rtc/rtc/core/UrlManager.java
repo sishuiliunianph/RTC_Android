@@ -23,8 +23,16 @@ public class UrlManager {
     private SharedPreferences mPrefs;
     private Context mCtx;
 
+    private static UrlManager mInstance;
 
-    public UrlManager(Context ctx) {
+    public static UrlManager getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new UrlManager(context);
+        }
+        return mInstance;
+    }
+
+    private UrlManager(Context ctx) {
         this.mCtx = ctx.getApplicationContext();
         mProtocol = DEFAULT_PROTOCOL;
         getLoginUrl();
@@ -39,8 +47,8 @@ public class UrlManager {
 
     public String getRootUrl() {
         if (mHost == null) {
-            //mHost = getPrefs().getString(HOST, "opentechtest.chinacloudapp.cn");
-            mHost = getPrefs().getString(HOST, "10.205.18.171");
+            mHost = getPrefs().getString(HOST, "opentechtest.chinacloudapp.cn");
+            //mHost = getPrefs().getString(HOST, "10.205.18.171");
             mPort = getPrefs().getInt(PORT, 4567);
             if (mHost != null) {
                 return mProtocol + mHost + ":" + mPort + "/";
@@ -52,8 +60,24 @@ public class UrlManager {
         return mProtocol + mHost + ":" + mPort + "/";
     }
 
+    public String getWorkitemUrl(int id) {
+        return getRootUrl() + "workitems?id=" + id;
+    }
+
     public String getLoginUrl() {
         return getRootUrl() + LOGIN_PATH;
+    }
+
+    public String getmHost() {
+        synchronized (mHost) {
+            return mHost;
+        }
+    }
+
+    public Integer getmPort() {
+        synchronized (mPort) {
+            return mPort;
+        }
     }
 
     public void setHost(String host) {
