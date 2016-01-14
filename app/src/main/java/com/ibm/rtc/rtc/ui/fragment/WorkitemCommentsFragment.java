@@ -50,6 +50,9 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
 
     private int workitemId;
 
+    // 展示添加评论的临时变量
+    private List<Comment> temp;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,15 +64,10 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
         mRequestQueue = VolleyQueue.getInstance(getActivity()).getRequestQueue();
     }
 
-    List<Comment> comments = new ArrayList<>(); // 测试用的临时List
-    Comment test1 = new Comment("test1", new Date(), "comment of test1");
-    Comment test2 = new Comment("test2", new Date(), "comment of test2");
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        comments.add(test1);
-        comments.add(test2);
         return inflater.inflate(R.layout.fragment_comments_list, container, false);
     }
 
@@ -91,9 +89,11 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
                             public void onClick(MaterialDialog dialog, DialogAction which) {
                                 String comment = commentEditText.getText().toString();
                                 // TODO: 2016/1/13  将结果写回服务器
+                                // TODO: 2016/1/14 delete this line
+                                hideEmpty();
                                 Comment test3 = new Comment("new creator", new Date(), comment);
-                                comments.add(0, test3);
-                                setUpList(comments);
+                                temp.add(0, test3);
+                                setUpList(temp);
                             }
                         })
                         .negativeText(R.string.cancel_comment)
@@ -126,7 +126,11 @@ public class WorkitemCommentsFragment extends LoadingListFragment<CommentAdapter
                         }
                     } else {
                         setEmpty();
+                        // TODO: 2016/1/14 delete this line
+                        setUpList(comments);
                     }
+                    // TODO: 2016/1/14 delete this line
+                    temp = comments;
                     stopRefresh();
                 }
             },
