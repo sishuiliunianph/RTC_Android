@@ -76,4 +76,8 @@
 
     <!-- Workitem comments fragment -->
     <string name="workitem_comment_title">Comments</string>
+    <string name="no_comments">No comment</string>
+    <string name="prompt_comment">Add Comment</string>
+    <string name="commit_comment">Commit</string>
+    <string name="cancel_comment">Cancel</string>
 </resources>

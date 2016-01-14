@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?selectableItemBackground">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/gapMedium"
+        android:layout_marginLeft="@dimen/gapMedium"
+        android:layout_marginRight="@dimen/gapMedium"
+        android:layout_marginEnd="@dimen/gapMedium"
+        android:layout_marginTop="@dimen/gapMedium"
+        android:layout_marginBottom="@dimen/gapSmall">
+
+        <TextView
+            android:id="@+id/creator"
+            tools:text="Creator"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/gapMedium"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/textSizeMedium"
+            android:fontFamily="sans-serif"
+            android:lines="1"
+            android:textStyle="bold"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/createTime"
+            tools:text="Create Time"
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_below="@+id/creator"
+            android:layout_alignLeft="@+id/creator"
+            android:layout_alignStart="@+id/creator"
+            android:layout_marginLeft="@dimen/gapMedium"
+            android:layout_marginTop="@dimen/gapSmall"
+            android:textSize="@dimen/textSizeMicro"/>
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            tools:text="Description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:layout_below="@+id/createTime"
+            android:layout_marginLeft="@dimen/gapMedium"
+            android:textSize="@dimen/textSizeSmall" />
+
+    </RelativeLayout>
+
+</LinearLayout>
