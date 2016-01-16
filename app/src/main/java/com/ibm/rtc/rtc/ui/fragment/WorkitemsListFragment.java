@@ -20,6 +20,7 @@ import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.adapter.WorkitemAdapter;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.VolleyQueue;
+import com.ibm.rtc.rtc.core.WorkitemFilter;
 import com.ibm.rtc.rtc.core.WorkitemSorter;
 import com.ibm.rtc.rtc.core.WorkitemsRequest;
 import com.ibm.rtc.rtc.model.Project;
@@ -45,8 +46,9 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
 
     private RequestQueue mRequestQueue;
     private Project mProject;
-    private List<Workitem> list; // 当前project下的workitem列表
+    private List<Workitem> workitemList; //当前选择条件下的workitem列表
     private int sortType = -1; // 当前界面下workitem的排序方式，默认根据id升序排列
+    private List<String> filterList = new ArrayList<String>();
     private ArrayList<Integer> mFilterIds;
     private ArrayList<String> mFilterNames;
     private final int DEFAULT_STATUS_CODE = 500;
@@ -131,6 +133,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                         for (int i = 0; i < text.length; ++i) {
                             filters.add(String.valueOf(text[i]));
                         }
+                        filterList = filters;
 
                         WorkitemsListFragment.this.mFilterNames = new ArrayList<String>(filters);
                         saveFilter();
@@ -146,6 +149,8 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                 WorkitemsListFragment.this.mFilterIds = null;
                 WorkitemsListFragment.this.mFilterNames = null;
                 clearSavedFilter();
+                // 点击clear，直接展示所有的workitem
+                filterList = null;
                 executeRequest();
             }
         }).show();
@@ -173,7 +178,7 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                     public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                         // 改变页面workitem的排序方式，并将该方式缓存起来
                         sortType = which;
-                        setUpList(list, sortType);
+                        executeRequest();
                         return true;
                     }
                 }).show();
@@ -199,7 +204,6 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         SharedPreferences.Editor edit = shared.edit();
         edit.remove("WORKITEM_FILTER");
         edit.remove("WORKITEM_FILTER_IDS");
-        edit.remove("WORKITEM_SORTER");
         edit.apply();
     }
 
@@ -224,16 +228,22 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         }
     }
 
-    public void setUpList(List<Workitem> workitems, int which) {
+    public void setUpList(List<Workitem> workitems) {
         WorkitemAdapter adapter = new WorkitemAdapter(getActivity(),
                 LayoutInflater.from(getActivity()));
         adapter.setRecyclerAdapterContentListener(this);
+        SharedPreferences sharedPreferences= getActivity().getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
 
-
-        //默认以id升序
-        WorkitemSorter.sort(workitems, which);
+        // 筛选出符合条件的workitem
+        workitemList = WorkitemFilter.filter(workitems, filterList);
+        // 对筛选出的workitem进行排序
+        if (sortType == -1) {
+            WorkitemSorter.sort(workitemList, sharedPreferences.getInt("WORKITEM_SORTER",0));
+        } else {
+            WorkitemSorter.sort(workitemList, sortType);
+        }
         //将排序后的workitems添加到适配器中
-        adapter.addAll(workitems);
+        adapter.addAll(workitemList);
 
         setAdapter(adapter);
     }
@@ -249,15 +259,9 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                 @Override
                 public void onResponse(List<Workitem> workitems) {
                     if (workitems != null && !workitems.isEmpty()) {
-                        list = workitems;
                         hideEmpty();
                         if (refreshing || getAdapter() == null) {
-                            if (sortType == -1) {
-                                SharedPreferences sharedPreferences= getActivity().getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
-                                setUpList(workitems, sharedPreferences.getInt("WORKITEM_SORTER",0));
-                            } else {
-                                setUpList(workitems, sortType);
-                            }
+                            setUpList(workitems);
                         }
                     } else {
                         setEmpty();

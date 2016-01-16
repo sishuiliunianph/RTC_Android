@@ -132,6 +132,7 @@ public abstract class LoadingListFragment<Adapter extends RecyclerArrayAdapter> 
     }
 
     protected void executeRequest() {
+        refreshing = true;
         startRefresh();
     }
 
@@ -145,7 +146,6 @@ public abstract class LoadingListFragment<Adapter extends RecyclerArrayAdapter> 
 
     @Override
     public void onRefresh() {
-        refreshing = true;
         executeRequest();
     }
 
@@ -174,6 +174,7 @@ public abstract class LoadingListFragment<Adapter extends RecyclerArrayAdapter> 
     }
 
     protected void stopRefresh() {
+        refreshing = false;
         if (swipe != null) {
             fromRetry = false;
             swipe.post(new Runnable() {
