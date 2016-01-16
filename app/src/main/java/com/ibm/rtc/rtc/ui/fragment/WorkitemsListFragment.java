@@ -15,12 +15,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.Gson;
 import com.ibm.rtc.rtc.R;
 import com.ibm.rtc.rtc.adapter.WorkitemAdapter;
 import com.ibm.rtc.rtc.core.UrlManager;
 import com.ibm.rtc.rtc.core.VolleyQueue;
-import com.ibm.rtc.rtc.core.WorkitemFilter;
 import com.ibm.rtc.rtc.core.WorkitemSorter;
 import com.ibm.rtc.rtc.core.WorkitemsRequest;
 import com.ibm.rtc.rtc.model.Project;
@@ -46,11 +44,9 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
 
     private RequestQueue mRequestQueue;
     private Project mProject;
-    private List<Workitem> workitemList; //当前选择条件下的workitem列表
     private int sortType = -1; // 当前界面下workitem的排序方式，默认根据id升序排列
-    private List<String> filterList = new ArrayList<String>();
-    private ArrayList<Integer> mFilterIds;
-    private ArrayList<String> mFilterNames;
+    private List<String> mFilterNames;
+    private List<Integer> mFilterIds;
     private final int DEFAULT_STATUS_CODE = 500;
 
     public static WorkitemsListFragment newInstance(Project project) {
@@ -84,12 +80,12 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
             MenuItem itemFilter = menu.findItem(R.id.workitem_filter);
             if (itemFilter != null) {
                 itemFilter.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_filter_list)
-                    .colorRes(R.color.white).actionBar());
+                        .colorRes(R.color.white).actionBar());
             }
             MenuItem itemSort = menu.findItem(R.id.workitem_sort);
             if (itemSort != null) {
                 itemSort.setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_sort)
-                    .colorRes(R.color.white).actionBar());
+                        .colorRes(R.color.white).actionBar());
             }
         }
     }
@@ -133,10 +129,8 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                         for (int i = 0; i < text.length; ++i) {
                             filters.add(String.valueOf(text[i]));
                         }
-                        filterList = filters;
+                        mFilterNames = filters;
 
-                        WorkitemsListFragment.this.mFilterNames = new ArrayList<String>(filters);
-                        saveFilter();
                         executeRequest();
                         return false;
                     }
@@ -146,11 +140,8 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
             @Override
             public void onNeutral(MaterialDialog dialog) {
                 super.onNeutral(dialog);
-                WorkitemsListFragment.this.mFilterIds = null;
-                WorkitemsListFragment.this.mFilterNames = null;
-                clearSavedFilter();
                 // 点击clear，直接展示所有的workitem
-                filterList = null;
+                mFilterNames = null;
                 executeRequest();
             }
         }).show();
@@ -184,29 +175,6 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
                 }).show();
     }
 
-    private void saveFilter() {
-        if (mFilterIds != null && mFilterNames != null) {
-            SharedPreferences sharedPreferences = getActivity()
-                    .getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
-
-            Gson gson = new Gson();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("WORKITEM_FILTER", gson.toJson(mFilterNames));
-            editor.putString("WORKITEM_FILTER_IDS", gson.toJson(mFilterIds));
-            editor.apply();
-        }
-    }
-
-    private void clearSavedFilter() {
-        SharedPreferences shared = getActivity()
-                .getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor edit = shared.edit();
-        edit.remove("WORKITEM_FILTER");
-        edit.remove("WORKITEM_FILTER_IDS");
-        edit.apply();
-    }
-
     private void saveSorter() {
         SharedPreferences sharedPreferences = getActivity()
                 .getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
@@ -218,7 +186,6 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         }
         editor.apply();
     }
-
 
     private void loadArgumentsForProject() {
         if (getArguments() != null) {
@@ -234,8 +201,19 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         adapter.setRecyclerAdapterContentListener(this);
         SharedPreferences sharedPreferences= getActivity().getSharedPreferences(WORKITEM_CONFIG, Context.MODE_PRIVATE);
 
-        // 筛选出符合条件的workitem
-        workitemList = WorkitemFilter.filter(workitems, filterList);
+        List<Workitem> workitemList = new ArrayList<Workitem>();
+        // 如果筛选条件为空，则直接返回原本list
+        if (mFilterNames == null || mFilterNames.isEmpty()) {
+            workitemList.addAll(workitems);
+        } else {
+            // 根据筛选条件返回满足条件的list
+            for (Workitem workitem : workitems) {
+                if (mFilterNames.contains(workitem.getTypeIndentifier().name())) {
+                    workitemList.add(workitem);
+                }
+            }
+        }
+
         // 对筛选出的workitem进行排序
         if (sortType == -1) {
             WorkitemSorter.sort(workitemList, sharedPreferences.getInt("WORKITEM_SORTER",0));
@@ -255,34 +233,34 @@ public class WorkitemsListFragment extends LoadingListFragment<WorkitemAdapter> 
         UrlManager urlManager = UrlManager.getInstance(getActivity());
         String workitemsUrl = urlManager.getRootUrl() + "workitems?uuid=" + mProject.getUuid();
         WorkitemsRequest workitemsRequest = new WorkitemsRequest(workitemsUrl,
-            new Response.Listener<List<Workitem>>() {
-                @Override
-                public void onResponse(List<Workitem> workitems) {
-                    if (workitems != null && !workitems.isEmpty()) {
-                        hideEmpty();
-                        if (refreshing || getAdapter() == null) {
-                            setUpList(workitems);
+                new Response.Listener<List<Workitem>>() {
+                    @Override
+                    public void onResponse(List<Workitem> workitems) {
+                        if (workitems != null && !workitems.isEmpty()) {
+                            hideEmpty();
+                            if (refreshing || getAdapter() == null) {
+                                setUpList(workitems);
+                            }
+                        } else {
+                            setEmpty();
                         }
-                    } else {
-                        setEmpty();
+                        stopRefresh();
                     }
-                    stopRefresh();
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.d(TAG, "Fetch workitems error: " + volleyError.getMessage());
-                    stopRefresh();
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.d(TAG, "Fetch workitems error: " + volleyError.getMessage());
+                        stopRefresh();
 
-                    //TODO 设置合适的错误类型信息
-                    setEmpty(true, volleyError.networkResponse == null ?
-                        DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
+                        //TODO 设置合适的错误类型信息
+                        setEmpty(true, volleyError.networkResponse == null ?
+                                DEFAULT_STATUS_CODE : volleyError.networkResponse.statusCode);
 
-                    if (getView() != null)
-                        Snackbar.make(getView(), getText(R.string.workitem_list_refresh_error), Snackbar.LENGTH_SHORT).show();
-                }
-            });
+                        if (getView() != null)
+                            Snackbar.make(getView(), getText(R.string.workitem_list_refresh_error), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
         workitemsRequest.setTag(TAG);
         mRequestQueue.add(workitemsRequest);
     }
